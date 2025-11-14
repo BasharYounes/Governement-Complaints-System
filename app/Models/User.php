@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
+    /**
+     * الميزات المستخدمة في النموذج.
+     */
     use HasApiTokens,HasFactory, Notifiable;
 
     /**
@@ -82,70 +85,26 @@ class User extends Authenticatable
         }
         return Storage::url($value);
     }
-
-     public function follow(User $user)
-    {
-        if (!$this->isFollowing($user)) {
-            \DB::transaction(function () use ($user) {
-                $this->following()->attach($user);
-
-                $this->increment('following_count');
-                $user->increment('followers_count');
-
-                GenericNotificationEvent::dispatch($user,'new_follower',['follower_name' => $this->name]);
-            });
-
-        }
-    }
-
-
-    public function unfollow(User $user)
-    {
-        \DB::transaction(function () use ($user) {
-            $this->following()->detach($user);
-
-            $this->decrement('following_count');
-            $user->decrement('followers_count');
-        });
-    }
-
     /**
-     * العلاقة مع المتابعين
+     * العلاقة مع الشكاوى.
      */
-    public function followers()
+    public function complaints()
     {
-        return $this->belongsToMany(User::class, 'follows', 'followed_id', 'follower_id')
-                    ->withTimestamps();
+        return $this->hasMany(Complaint::class);
     }
-
     /**
-     * العلاقة مع المتابَعين
+     * العلاقة مع سجلات تدقيق الشكاوى.
      */
-    public function following()
+    public function complaintAuditLogs()
     {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followed_id')
-                    ->withTimestamps();
+        return $this->hasMany(ComplaintAuditLog::class);
     }
-
-    // للتحقق إذا كان يتابع مستخدم معين
-    public function isFollowing($id)
+    /**
+     * العلاقة مع المرفقات.
+     */
+    public function attachments()
     {
-        return $this->following()->where('followed_id', $id)->exists();
-    }
-
-    // العلاقة مع الحظورات
-  
-
-    // الحصول على آخر حظر فعال
-    public function activeBan()
-    {
-        return $this->bans()->active()->latest()->first();
-    }
-
-    // التحقق إذا كان المستخدم محظورًا حالياً
-    public function isBanned()
-    {
-        return $this->is_banned || $this->bans()->active()->exists();
+        return $this->hasMany(Attachment::class);
     }
 
 }
