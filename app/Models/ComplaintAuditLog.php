@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ComplaintAuditDetail;
 
 class ComplaintAuditLog extends Model
 {
@@ -24,13 +25,12 @@ class ComplaintAuditLog extends Model
     {
         return $this->belongsTo(Complaint::class);
     }
-    /**
-     * العلاقة مع تفاصيل سجل التدقيق.
-     */
+
     public function details()
     {
-        return $this->hasMany(ComplaintAuditDetail::class);
+        return $this->hasMany(ComplaintAuditDetail::class, 'audit_log_id');
     }
+
     /**
      * العلاقة مع المستخدم الذي قام بالإجراء.
      */
@@ -38,4 +38,5 @@ class ComplaintAuditLog extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 }

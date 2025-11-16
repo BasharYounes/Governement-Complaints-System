@@ -10,6 +10,7 @@ class GovernmentEntities extends Model
     use HasFactory;
     protected $fillable = [
         'name',
+        'code',
         'location'
     ];
 

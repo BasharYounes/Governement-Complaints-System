@@ -50,4 +50,9 @@ class Complaint extends Model
     {
         return $this->hasMany(Attachment::class);
     }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(ComplaintAuditLog::class, 'complaint_id');
+    }
 }

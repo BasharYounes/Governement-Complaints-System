@@ -2,9 +2,11 @@
 
 
 
+use App\Http\Controllers\ComplaintController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgetPasswordController;
+
 
 
 /*
@@ -33,7 +35,16 @@ Route::post('/check-code',[ForgetPasswordController::class,'checkCode']);
 
         Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
         Route::post('/logout',        [AuthController::class, 'logout']);
-
+        Route::post('/edit-profile',       [AuthController::class, 'EditInformation']);
+        
+        Route::prefix('complaints')->group(function () {
+            Route::post('create', [ComplaintController::class, 'create']);
+            Route::get('{id}', [ComplaintController::class, 'show']);
+            Route::post('update/{id}', [ComplaintController::class, 'update']);
+            Route::delete('delete/{id}', [ComplaintController::class, 'destroy']);
+            Route::post('add-attachment', [ComplaintController::class, 'addAttachment']);
+            Route::get('get-user-complaints', [ComplaintController::class, 'getUserComplaints']);
+        });
 
 
 

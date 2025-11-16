@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('government_entities', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('code')->unique();
-            $table->string('location');
-            $table->timestamps();
+       Schema::create('notifications', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained(); 
+        $table->string('title'); 
+        $table->text('body');
+        $table->boolean('is_read')->default(false);
+        $table->timestamps(); 
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('government_entities');
+        Schema::dropIfExists('notifications');
     }
 };
