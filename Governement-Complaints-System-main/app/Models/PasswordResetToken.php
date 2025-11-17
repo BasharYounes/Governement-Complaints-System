@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class PasswordResetToken extends Model
+{
+    /**
+     * استخدام خاصية المصنع للنماذج.
+     */
+    use HasFactory;
+    /**
+     * الحقول القابلة للتعبئة.
+     */
+    protected $fillable = ['email','token'];
+}
