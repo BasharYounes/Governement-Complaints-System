@@ -2,6 +2,9 @@
 
 namespace App\Observer;
 
+use App\Jobs\CleanupComplaintAttachmentsJob;
+use App\Jobs\ProcessComplaintAttachmentJob;
+use App\Models\Attachment;
 use App\Models\Complaint;
 
 class ComplaintObserver
@@ -12,30 +15,27 @@ class ComplaintObserver
     {
         $this->request = request();
     }
+
     /**
      * Handle the Complaint "created" event.
      */
     public function created(Complaint $complaint): void
     {
         $this->createAuditLog($complaint,'created','تم إنشاء الشكوى');
+        // ProcessComplaintAttachmentJob::dispatch($complaint->id,request()->file('attachments'),auth()->id());
     }
-        // Intentionally left empty. Audit log for deletion is created in the "deleting" event
-        // to ensure the complaint record still exists when the audit row is inserted.
+
     public function updating(Complaint $complaint): void
     {
         $original = $complaint->getOriginal();
         $dirty = $complaint->getDirty();
-        // إذا لم تتغير أي بيانات، توقف
+
         if (empty($dirty)) {
             return;
         }
-        // تحديد نوع الإجراء ووصفه
         $action = $this->determineAction($dirty);
-        //إنشاء وصف مناسب للإجراء
         $description = $this->generateDescription($action, $dirty, $original);
-        // إنشاء سجل التدقيق
         $auditLog = $this->createAuditLog($complaint, $action, $description);
-        // تسجيل التفاصيل المتغيرة
         $this->createAuditDetails($complaint, $original, $dirty);
     }
 
@@ -76,6 +76,15 @@ class ComplaintObserver
     }
 
     /**
+     * Handle the Complaint "deleted" event.
+     */
+    public function deleted(Complaint $complaint): void
+    {
+        // Dispatch the job to clean up attachments
+        // CleanupComplaintAttachmentsJob::dispatch($complaint->id);
+    }
+
+    /**
      * Handle the Complaint "restored" event.
      */
     public function createAuditLog(Complaint $complaint,$action,$description)
@@ -90,8 +99,6 @@ class ComplaintObserver
                 'user_agent' => request()->header('User-Agent'),
             ]);
         });
-
-
     }
 
     /**
@@ -144,7 +151,6 @@ class ComplaintObserver
             $newStatus = $dirty['status'];
             return "تم تغيير حالة الشكوى من {$this->getStatusText($oldStatus)} إلى {$this->getStatusText($newStatus)}";
         }
-
         if ($action === 'updated') {
             $changedFields = array_keys($dirty);
             if (count($changedFields) === 1) {

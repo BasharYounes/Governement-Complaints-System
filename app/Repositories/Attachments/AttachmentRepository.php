@@ -26,4 +26,18 @@ class AttachmentRepository
         $info['file_path'] = $attachmentRequest['file']->storeAs('storage\app\public\attachments', $info['file_name']);
         return Attachment::create($info);
     }
+
+    public function deleteAttachmentsByComplaintId($complaintId)
+    {
+        $attachments = Attachment::where('complaint_id', $complaintId)->get();
+
+        foreach ($attachments as $attachment) {
+            // حذف الملف من التخزين
+            if (file_exists($attachment->file_path)) {
+                unlink($attachment->file_path);
+            }
+            // حذف السجل من قاعدة البيانات
+            $attachment->delete();
+        }
+    }
 }
