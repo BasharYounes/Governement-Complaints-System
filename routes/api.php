@@ -3,6 +3,7 @@
 
 
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\GovernmentEntitiesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgetPasswordController;
@@ -44,6 +45,10 @@ Route::post('/check-code',[ForgetPasswordController::class,'checkCode']);
             Route::delete('delete/{id}', [ComplaintController::class, 'destroy']);
             Route::post('add-attachment', [ComplaintController::class, 'addAttachment']);
             Route::get('get-user-complaints', [ComplaintController::class, 'getComplaintsforUser']);
+        });
+
+        Route::prefix('government-entities')->group(function () {
+            Route::get('/all-entities', [GovernmentEntitiesController::class, 'index']);
         });
 
 

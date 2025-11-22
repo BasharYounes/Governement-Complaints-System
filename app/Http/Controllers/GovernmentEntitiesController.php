@@ -3,16 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Government_entities;
+use App\Repositories\GovernementEntities\GovernmentEntityRepository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class GovernmentEntitiesController extends Controller
 {
+    use ApiResponse;
+
+    public function __construct(protected GovernmentEntityRepository $governmentEntityRepository)
+    {
+        //
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return $this->success('Government entities retrieved successfully', $this->governmentEntityRepository->getAllEntities(), 200);
     }
 
     /**

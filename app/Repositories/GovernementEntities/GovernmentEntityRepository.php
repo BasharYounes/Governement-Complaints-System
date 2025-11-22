@@ -11,4 +11,9 @@ class GovernmentEntityRepository
         $entity = GovernmentEntities::where('id', $id)->firstOrFail();
         return $entity;
     }
+
+    public function getAllEntities()
+    {
+        return GovernmentEntities::all();
+    }
 }
