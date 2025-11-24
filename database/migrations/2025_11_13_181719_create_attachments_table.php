@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('complaint_id');
-            $table->string('file_path');
+            $table->string(column: 'file_path');
             $table->string('file_name');
             $table->string('mime_type');
             $table->string('file_size');

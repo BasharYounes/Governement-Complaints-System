@@ -30,5 +30,10 @@ class ComplaintAuditDetail extends Model
         return $this->belongsTo(ComplaintAuditLog::class, 'audit_log_id');
     }
 
+    public function details()
+{
+    return $this->hasMany(ComplaintAuditDetail::class, 'audit_log_id', 'id');
+}
+
 
 }

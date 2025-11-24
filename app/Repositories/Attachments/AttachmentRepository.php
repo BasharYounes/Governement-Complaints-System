@@ -15,29 +15,13 @@ class AttachmentRepository
     {
         //
     }
-    /**
-     * رفع المرفق وتخزينه في قاعدة البيانات.
-     */
-    public function UploadAttachment(Array $attachmentRequest,$id)
+    public function UploadAttachment(Array $attachmentRequest)
     {
         $info = $this->attachmentService->extractInfoFromFile($attachmentRequest['file']);
-        $info['complaint_id'] = $id;
+        $info['complaint_id'] = $attachmentRequest['complaint_id'];
         $info['uploaded_by'] = auth()->id();
-        $info['file_path'] = $attachmentRequest['file']->storeAs('storage\app\public\attachments', $info['file_name']);
+        // Logic to upload attachment
+        $info['file_path'] = $attachmentRequest['file']->store('attachments', 'public');
         return Attachment::create($info);
-    }
-
-    public function deleteAttachmentsByComplaintId($complaintId)
-    {
-        $attachments = Attachment::where('complaint_id', $complaintId)->get();
-
-        foreach ($attachments as $attachment) {
-            // حذف الملف من التخزين
-            if (file_exists($attachment->file_path)) {
-                unlink($attachment->file_path);
-            }
-            // حذف السجل من قاعدة البيانات
-            $attachment->delete();
-        }
     }
 }

@@ -8,6 +8,7 @@ use App\Exceptions\InvalidCodeException;
 use App\Http\Requests\EmailAndCodeRequest;
 use App\Http\Requests\EmailRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterEmployeeRequest;
 use App\Repositories\UserRepository;
 use App\Services\CasheService;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class AuthController extends Controller
      *
      * @throws \Exception
      */
-    public function Register(RegisterRequest $registerRequest)
+    public function RegisterUser(RegisterRequest $registerRequest)
     {
         $user = $this->authService->registerUser($registerRequest);
 
@@ -48,6 +49,30 @@ class AuthController extends Controller
 
         return $this->success('تم إرسال كود التحقق', ['user' => $user, 'code' => $code]);
     }
+
+ public function RegisterEmployee(RegisterEmployeeRequest $registerRequest)
+    {
+        $user = $this->authService->registerEmployee($registerRequest);
+
+        $code = $this->codeService->generateCode($user);
+
+        event(new UserRegistered($user, $code));
+
+        return $this->success('تم إرسال كود التحقق', ['user' => $user, 'code' => $code]);
+    }
+
+    public function RegisterAdmin(RegisterRequest $registerRequest)
+    {
+        $user = $this->authService->registerAdmin($registerRequest);
+
+        $code = $this->codeService->generateCode($user);
+
+        event(new UserRegistered($user, $code));
+
+        return $this->success('تم إرسال كود التحقق', ['user' => $user, 'code' => $code]);
+    }
+
+    
 
     public function EditInformation(UpdateUserInformationRequest $request)
     {

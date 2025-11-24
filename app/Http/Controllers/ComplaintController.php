@@ -44,7 +44,7 @@ class ComplaintController extends Controller
 
         $complaint = $this->complaintRepository->createComplaint($complaintRequest->validated(), $referenceNumber);
 
-        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated(),$complaint->id);
+        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated());
 
     return $this->success('Complaint created successfully',[$complaint,$attachments], 201);
     }
@@ -78,7 +78,7 @@ class ComplaintController extends Controller
 
     public function addAttachment(AttachmentRequest $attachmentRequest,$id)
     {
-        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated(),$id);
+        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated());
     return $this->success('Attachments uploaded successfully', $attachments, 201);
     }
 

@@ -23,6 +23,7 @@ class AttachmentRequest extends FormRequest
     {
         return [
             'file' => 'required|file|max:10240', // الحد الأقصى لحجم الملف 10 ميجابايت
+            'complaint_id' => 'required|exists:complaints,id',
         ];
     }
 

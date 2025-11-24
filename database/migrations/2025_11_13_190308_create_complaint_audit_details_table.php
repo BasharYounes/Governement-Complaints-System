@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('audit_log_id');
             $table->string('field_name');
-            $table->text('old_value');
-            $table->text('new_value');
+            $table->text('old_value')->nullable();
+            $table->text('new_value')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

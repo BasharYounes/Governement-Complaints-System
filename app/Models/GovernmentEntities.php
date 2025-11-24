@@ -10,11 +10,16 @@ class GovernmentEntities extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'code',
         'location'
     ];
 
     protected $casts = [
         'location' => 'array'
     ];
+
+    public function employees()
+{
+    return $this->hasMany(User::class, 'government_entity_id');
+}
+
 }

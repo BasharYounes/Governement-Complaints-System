@@ -9,10 +9,11 @@
         "kreait/laravel-firebase": "^6.1",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.1",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "4.x-dev",
+        "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {
-        "andreaselia/laravel-api-to-postman": "^2.1",
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.13",
@@ -68,6 +69,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

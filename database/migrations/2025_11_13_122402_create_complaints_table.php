@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('description');
             $table->enum('status', ['new', 'in_progress', 'completed','rejected'])->default('new');
             $table->string('reference_number')->unique();
-            $table->string('location')->nullable();
+            $table->string('location');
             $table->string('type');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('government_entity_id');
@@ -25,6 +25,7 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('government_entity_id')->references('id')->on('government_entities')->onDelete('cascade');
+
             // $table->index('user_id');
 
         });
