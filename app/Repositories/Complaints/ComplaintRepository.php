@@ -15,7 +15,7 @@ class ComplaintRepository
 
     public function getComplaintById($id): Complaint
     {
-        $complaint = Complaint::find($id);
+        $complaint = Complaint::with('governmentEntity')->where('id', $id)->first();
         if (! $complaint) {
             abort(response()->json([
                 'success' => false,

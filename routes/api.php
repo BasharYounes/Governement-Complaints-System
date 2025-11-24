@@ -3,7 +3,9 @@
 
 
 use App\Http\Controllers\AdminComplaintController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\EmployeeComplaintController;
+use App\Http\Controllers\GovernmentEntitiesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgetPasswordController;
@@ -39,6 +41,20 @@ Route::post('/registerEmployee',[AuthController::class,'RegisterEmployee'])->mid
 
         Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
         Route::post('/logout',        [AuthController::class, 'logout']);
+        Route::post('/edit-profile',       [AuthController::class, 'EditInformation']);
+
+        Route::prefix('complaints')->group(function () {
+            Route::post('create', [ComplaintController::class, 'create']);
+            Route::get('show/{id}', [ComplaintController::class, 'show']);
+            Route::post('update/{id}', [ComplaintController::class, 'update']);
+            Route::delete('delete/{id}', [ComplaintController::class, 'destroy']);
+            Route::post('add-attachment', [ComplaintController::class, 'addAttachment']);
+            Route::get('get-user-complaints', [ComplaintController::class, 'getComplaintsforUser']);
+        });
+
+        Route::prefix('government-entities')->group(function () {
+            Route::get('/all-entities', [GovernmentEntitiesController::class, 'index']);
+        });
 
     });
 
