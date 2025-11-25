@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\GenericNotificationEvent;
 use App\Http\Requests\UpdateComplaintStatusRequest;
+use App\Repositories\Complaints\ComplaintRepository;
 use App\Services\EmployeeComplaintService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +16,9 @@ class EmployeeComplaintController extends Controller
 
     protected EmployeeComplaintService $complaintService;
 
-    public function __construct(EmployeeComplaintService $complaintService)
+    public function __construct(EmployeeComplaintService $complaintService,
+        protected ComplaintRepository $complaintRepository,
+    )
     {
         $this->complaintService = $complaintService;
 
@@ -77,5 +81,20 @@ class EmployeeComplaintController extends Controller
             'تمت إضافة الملاحظات بنجاح',
             $complaint
         );
+    }
+
+    public function RequestAdditionalInformation($id,Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $complaint = $this->complaintRepository->getComplaintById($id);
+
+        event(new GenericNotificationEvent(
+            $request->user_id,
+            "RequestAdditionalInformation",
+            ["reference_number" => $complaint->reference_number]
+        ));
     }
 }

@@ -4,10 +4,13 @@ namespace App\Observer;
 
 
 use App\Models\Complaint;
+use App\Traits\DetectsActor;
 
 class ComplaintObserver
 {
+    use DetectsActor;
     protected $request;
+
 
     public function __construct()
     {
@@ -86,7 +89,7 @@ class ComplaintObserver
     public function createAuditLog(Complaint $complaint,$action,$description)
     {
         return  \DB::transaction(function () use ($complaint,$action,$description) {
-            $actor = auth()->user();
+            $actor = $this->actor();
 
             $complaint->auditLogs()->create([
                 'complaint_id' => $complaint->id,
@@ -116,7 +119,7 @@ class ComplaintObserver
                 }
 
                 $originalValue = $original[$field] ?? null;
-                
+
                 // تحويل القيم إلى JSON فقط إذا كانت arrays أو objects
                 // القيم النصية والرقمية تبقى كما هي
                 $originalValue = $this->normalizeValue($originalValue);
@@ -140,7 +143,7 @@ class ComplaintObserver
         if (is_array($value) || is_object($value)) {
             return json_encode($value, JSON_UNESCAPED_UNICODE);
         }
-        
+
         // إذا كانت JSON string، نحاول تحويلها إلى array ثم إرجاعها كـ JSON مرة أخرى
         // لضمان التنسيق الموحد
         if (is_string($value) && $this->isJson($value)) {
@@ -149,7 +152,7 @@ class ComplaintObserver
                 return json_encode($decoded, JSON_UNESCAPED_UNICODE);
             }
         }
-        
+
         return $value;
     }
 
@@ -161,7 +164,7 @@ class ComplaintObserver
         if (!is_string($string)) {
             return false;
         }
-        
+
         json_decode($string);
         return json_last_error() === JSON_ERROR_NONE;
     }

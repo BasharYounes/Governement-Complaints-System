@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\GenericNotificationEvent;
+use App\Models\Complaint;
 use App\Services\AdminComplaintService;
 use App\Services\ExportReportsService;
 use Illuminate\Http\Request;
@@ -17,11 +19,8 @@ class AdminComplaintController extends Controller
 {
     $this->complaintService = $complaintService;
     $this->middleware(['auth:sanctum', 'role:super_admin']);
-    // $this->exportService = $exportService;   
+    // $this->exportService = $exportService;
 }
-
-     
-
     /**
      * List all complaints with full user, attachments, and government entity
      */
@@ -111,6 +110,8 @@ public function statistics()
     // Return a clean JSON response
     return $this->success('Fetched complaints statistics successfully.', $stats);
 }
+
+
 
 
 

@@ -68,6 +68,7 @@ Route::post('/registerEmployee',[AuthController::class,'RegisterEmployee'])->mid
     Route::get('/complaints', [EmployeeComplaintController::class, 'index'])->middleware('permission:view-complaint');
     Route::patch('/complaints/{complaintId}/status', [EmployeeComplaintController::class, 'updateStatus'])->middleware('permission:update-complaint');
     Route::post('/complaints/{complaintId}/notes', [EmployeeComplaintController::class, 'addNotes'])->middleware('permission:add-complaint-notes');
+    Route::post('complaints/{complaintId}/request-information', [EmployeeComplaintController::class, 'RequestAdditionalInformation']);
 });
     ///======================
     // ADMIN COMPLAINT ROUTES
