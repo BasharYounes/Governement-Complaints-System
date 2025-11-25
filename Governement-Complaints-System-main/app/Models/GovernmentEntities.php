@@ -17,9 +17,13 @@ class GovernmentEntities extends Model
         'location' => 'array'
     ];
 
-    public function employees()
-{
-    return $this->hasMany(User::class, 'government_entity_id');
-}
+//     public function employees()
+// {
+//     return $this->hasMany(User::class, 'government_entity_id');
+// }
 
+   public function employees()
+   {
+    return $this->hasMany(Employee::class, 'government_entity_id');
+   }
 }

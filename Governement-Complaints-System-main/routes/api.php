@@ -68,7 +68,11 @@ Route::middleware(['auth:sanctum', 'role:super_admin'])->prefix('admin')->group(
     
     Route::get('/complaint-logs', [AdminComplaintController::class, 'listAllComplaintLogs'])
         ->middleware('permission:view-all-complaint-logs');
-        Route::get('/reports/monthly', [AdminComplaintController::class, 'monthly']);
+        Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv'])
+            ->middleware('permission:export-monthly-csv');
+        Route::get('/reports/monthly/pdf1', [AdminComplaintController::class, 'monthlyPdf'])
+            ->middleware('permission:export-monthly-pdf');
 });
 
-
+ Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv']);
+  Route::get('/reports/monthly/pdf', [AdminComplaintController::class, 'monthlyPdf']);

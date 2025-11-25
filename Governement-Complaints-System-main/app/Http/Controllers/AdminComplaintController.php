@@ -6,18 +6,22 @@ use App\Services\AdminComplaintService;
 use App\Services\ExportReportsService;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ComplaintsExport;
+
+
 
 class AdminComplaintController extends Controller
 {
     use ApiResponse;
 
     protected AdminComplaintService $complaintService;
-    // protected ExportReportsService $exportService;
-   public function __construct(AdminComplaintService $complaintService)
+    protected ExportReportsService $exportService;
+   public function __construct(AdminComplaintService $complaintService , ExportReportsService $exportService)
 {
     $this->complaintService = $complaintService;
-    $this->middleware(['auth:sanctum', 'role:super_admin']);
-    // $this->exportService = $exportService;   
+    //$this->middleware(['auth:sanctum', 'role:super_admin']);
+    $this->exportService = $exportService;   
 }
 
      
@@ -114,28 +118,39 @@ public function statistics()
 
 
 
-//   // CSV export
-//     public function monthlyCsv(Request $request)
-//     {
-//         $request->validate([
-//             'month' => 'required|date_format:Y-m'
-//         ]);
+  // CSV export
+ public function monthlyCsv(Request $request)
+{
+    $month = $request->month ?? now()->format('Y-m');
+    $complaints = $this->exportService->getMonthlyComplaints($month);
 
-//         $complaints = $this->exportService->getMonthlyComplaints($request->month);
+    $fileName = "complaints_{$month}.csv";
+    $fileUrl = $this->exportService->exportCsv($complaints, $fileName);
 
-//         return $this->exportService->exportCsv($complaints, "complaints_{$request->month}.csv");
-//     }
+    return ApiResponse::success(
+        "تم إنشاء تقرير CSV بنجاح",
+        ['url' => $fileUrl]
+    );
+}
 
-//     // PDF export
-//     public function monthlyPdf(Request $request)
-//     {
-//         $request->validate([
-//             'month' => 'required|date_format:Y-m'
-//         ]);
 
-//         $complaints = $this->exportService->getMonthlyComplaints($request->month);
 
-//         return $this->exportService->exportPdf($complaints, "complaints_{$request->month}.pdf");
-//     }
+public function monthlyPdf(Request $request)
+{
+    // إذا ما وصل month → ناخد الشهر الحالي
+    $month = $request->month ?? now()->format('Y-m');
 
- }
+    // الحصول على البيانات
+    $complaints = $this->exportService->getMonthlyComplaints($month);
+
+    // توليد مسار الملف
+    $filePath = $this->exportService->exportPdf($complaints, $month);
+
+    // إرسال رابط التحميل (API Friendly)
+    return response()->json([
+        'success' => true,
+        'url' => asset($filePath)
+    ]);
+}
+
+}
