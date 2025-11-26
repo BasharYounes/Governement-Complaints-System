@@ -22,6 +22,5 @@ class AttachmentController extends Controller
         }
 
         return Storage::response($attachment->file_path);
-
     }
 }
