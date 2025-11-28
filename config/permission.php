@@ -199,4 +199,9 @@ return [
 
         'store' => 'default',
     ],
+    'guard_names' => [
+    'admin-api',
+    'employee-api',
+    'api',
+    ],
 ];

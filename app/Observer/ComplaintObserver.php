@@ -5,6 +5,7 @@ namespace App\Observer;
 
 use App\Models\Complaint;
 use App\Traits\DetectsActor;
+use DB;
 
 class ComplaintObserver
 {
@@ -28,16 +29,18 @@ class ComplaintObserver
 
     public function updating(Complaint $complaint): void
     {
-        $original = $complaint->getOriginal();
-        $dirty = $complaint->getDirty();
+        DB::transaction(function () use ($complaint) {
+            $original = $complaint->getOriginal();
+            $dirty = $complaint->getDirty();
 
-        if (empty($dirty)) {
-            return;
-        }
-        $action = $this->determineAction($dirty);
-        $description = $this->generateDescription($action, $dirty, $original);
-        $auditLog = $this->createAuditLog($complaint, $action, $description);
-        $this->createAuditDetails($complaint, $original, $dirty);
+            if (empty($dirty)) {
+                return;
+            }
+            $action = $this->determineAction($dirty);
+            $description = $this->generateDescription($action, $dirty, $original);
+            $auditLog = $this->createAuditLog($complaint, $action, $description);
+            $this->createAuditDetails($complaint, $original, $dirty);
+        });
     }
 
     /**
@@ -88,7 +91,7 @@ class ComplaintObserver
      */
     public function createAuditLog(Complaint $complaint,$action,$description)
     {
-        return  \DB::transaction(function () use ($complaint,$action,$description) {
+        return  DB::transaction(function () use ($complaint,$action,$description) {
             $actor = $this->actor();
 
             $complaint->auditLogs()->create([
@@ -108,7 +111,7 @@ class ComplaintObserver
      */
     public function createAuditDetails(Complaint $complaint, $original, $dirty): void
     {
-        \DB::transaction(function () use ($complaint,$dirty,$original) {
+        DB::transaction(function () use ($complaint,$dirty,$original) {
 
 
             $auditLog = $complaint->auditLogs()->latest()->first();

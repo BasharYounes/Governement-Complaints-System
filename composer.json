@@ -9,10 +9,10 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "kreait/laravel-firebase": "^6.1",
         "laravel/framework": "^11.0",
-        "laravel/sanctum": "^4.1",
+        "laravel/sanctum": "*",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "4.x-dev",
-        "mpdf/mpdf": "^8.2",
+        "mpdf/mpdf": "*",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {
@@ -72,5 +72,11 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        }
+    }
 }

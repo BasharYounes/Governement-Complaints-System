@@ -8,16 +8,21 @@ use App\Exceptions\InvalidCodeException;
 use App\Http\Requests\EmailAndCodeRequest;
 use App\Http\Requests\EmailRequest;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterEmployeeRequest;
+use App\Repositories\Admin\AdminRepository;
+use App\Repositories\ComplaintEmployeeRepository;
 use App\Repositories\UserRepository;
 use App\Services\CasheService;
+use DB;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateUserInformationRequest;
 use App\Services\AuthService;
 use App\Services\GenerateCode;
 use App\Traits\ApiResponse;
-
+use App\Http\Requests\AuthEmployee\SignInRequest as loginEmployeeRequest;
+use App\Http\Requests\AuthEmployee\SignUpRequest as registerEmployeeRequest;
+use App\Http\Requests\AuthAdmin\SignUpRequest as registerAdminRequest;
+use App\Http\Requests\AuthAdmin\SignInRequest as loginAdminRequest;
 
 
 class AuthController extends Controller
@@ -28,7 +33,9 @@ class AuthController extends Controller
         protected AuthService $authService,
         protected GenerateCode $codeService,
         protected UserRepository $userRepository,
-        protected CasheService $casheService
+        protected CasheService $casheService,
+        protected ComplaintEmployeeRepository $complaintEmployeeRepository,
+        protected AdminRepository $adminRepository,
     ) {}
 
     /**
@@ -50,34 +57,78 @@ class AuthController extends Controller
         return $this->success('تم إرسال كود التحقق', ['user' => $user, 'code' => $code]);
     }
 
- public function RegisterEmployee(RegisterEmployeeRequest $registerRequest)
+     public function registerEmployee(registerEmployeeRequest $registerEmployeeRequest)
     {
-        $user = $this->authService->registerEmployee($registerRequest);
-
-        $code = $this->codeService->generateCode($user);
-
-        event(new UserRegistered($user, $code));
-
-        return $this->success('تم إرسال كود التحقق', ['user' => $user, 'code' => $code]);
+        DB::transaction(function () use ($registerEmployeeRequest) {
+        $employee = $this->complaintEmployeeRepository->createEmployee($registerEmployeeRequest->validated());
+        $employee->assignRole('employee');
+        return $this->success('Employee Registered Successfully', [
+            'token' => $employee->createToken('employee_token')->plainTextToken,
+            'employee' => $employee
+            ]);
+        });
     }
 
-    public function RegisterAdmin(RegisterRequest $registerRequest)
+    public function loginEmployee(loginEmployeeRequest $loginEmployeeRequest)
     {
-        $user = $this->authService->registerAdmin($registerRequest);
+        $employee = $this->complaintEmployeeRepository->findByEmail($loginEmployeeRequest->email);
 
-        $code = $this->codeService->generateCode($user);
-
-        event(new UserRegistered($user, $code));
-
-        return $this->success('تم إرسال كود التحقق', ['user' => $user, 'code' => $code]);
+        if($employee &&  password_verify($loginEmployeeRequest->password, $employee->password))
+        {
+            return $this->success('Login Susseccfully', [
+                'token' => $employee->createToken('employee_token')->plainTextToken,
+                'employee' => $employee
+            ], 200);
+        }
+        return $this->error('Informations are not Correct',null, 401);
     }
 
-    
+    public function logoutEmployee(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->success("تم تسجيل الخروج بنجاح");
+
+    }
+
+    public function registerAdmin(registerAdminRequest $registerAdminRequest)
+    {
+        $admin = DB::transaction(function () use ($registerAdminRequest) {
+            $admin = $this->adminRepository->createAdmin($registerAdminRequest->validated());
+            $admin->assignRole('super_admin');
+            return $admin;
+        });
+        return $this->success('Admin Registered Successfully', [
+            'token' => $admin->createToken('admin_token')->plainTextToken,
+            'admin' => $admin
+            ], 201);
+    }
+
+    public function loginAdmin(loginAdminRequest $loginAdminRequest)
+    {
+        $admin = $this->adminRepository->findByEmail($loginAdminRequest->email);
+
+        if($admin &&  password_verify($loginAdminRequest->password, $admin->password))
+        {
+            return $this->success('Login Susseccfully', [
+                'token' => $admin->createToken('admin_token')->plainTextToken,
+                'admin' => $admin
+            ], 200);
+        }
+        return $this->error('Informations are not Correct',null, 401);
+    }
+
+    public function logoutAdmin(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->success("تم تسجيل الخروج بنجاح");
+
+    }
+
 
     public function EditInformation(UpdateUserInformationRequest $request)
     {
         $user = $this->userRepository->update(auth()->user(), $request);
-        
+
         return $this->success('success', ['user'=> $user]);
     }
 
@@ -193,9 +244,9 @@ class AuthController extends Controller
         $request->validate([
             'fcm_token' => 'required|string'
         ]);
-    
+
         $this->authService->storeFCM(auth()->user(),$request->input('fcm_token'));
-    
+
         return $this->success("Token saved successfully");
     }
 }

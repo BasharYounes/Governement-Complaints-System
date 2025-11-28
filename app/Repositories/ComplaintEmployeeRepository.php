@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Complaint;
+use App\Models\Employee;
 use Illuminate\Database\Eloquent\Collection;
 
 class ComplaintEmployeeRepository
@@ -43,5 +44,15 @@ class ComplaintEmployeeRepository
     {
         $complaint->update(['description' => $complaint->description . "\nNote: " . $notes]);
         return $complaint->fresh();
+    }
+
+    public function createEmployee(array $data)
+    {
+        return Employee::create($data);
+    }
+
+    public function findByEmail(string $email): ?Employee
+    {
+        return Employee::where('email', $email)->firstOrFail();
     }
 }

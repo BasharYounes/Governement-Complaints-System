@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Repositories;
 
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class UserRepository {
     use ApiResponse;
 
-    
+
     public function findByEmail($email) {
         return User::where('email', $email)->firstOrFail();
     }
@@ -36,11 +36,11 @@ class UserRepository {
         }
 
         $user->update($data);
-        
+
         return $user->fresh();
     }
 
-  
+
 
     public function deleteUserToken($user)
     {
@@ -51,7 +51,7 @@ class UserRepository {
 
      public function createToken($user)
     {
-        return $user->createToken('password-reset-token')->plainTextToken;
+        return $user->createToken('user_token', ['user'])->plainTextToken;
     }
 
     public function findById($id)

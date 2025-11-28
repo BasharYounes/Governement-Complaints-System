@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Events\GenericNotificationEvent;
 use App\Http\Requests\UpdateComplaintStatusRequest;
+use App\Repositories\ComplaintEmployeeRepository;
 use App\Repositories\Complaints\ComplaintRepository;
 use App\Services\EmployeeComplaintService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\ApiResponse;
+
 
 class EmployeeComplaintController extends Controller
 {
@@ -18,6 +20,7 @@ class EmployeeComplaintController extends Controller
 
     public function __construct(EmployeeComplaintService $complaintService,
         protected ComplaintRepository $complaintRepository,
+
     )
     {
         $this->complaintService = $complaintService;
@@ -40,6 +43,8 @@ class EmployeeComplaintController extends Controller
             $complaints
         );
     }
+
+
 
     /**
      * Update the status of a complaint.

@@ -28,19 +28,23 @@ Route::post('/resend-code',[AuthController::class,'ResendCode'])->middleware('th
 Route::post('/forget-password',[ForgetPasswordController::class,'forgotPassword']);
 Route::post('/check-code',[ForgetPasswordController::class,'checkCode']);
 
+
 // register "Admin"
-Route::post('/registerAdmin',[AuthController::class,'RegisterAdmin']);
+Route::post('/registerAdmin',[AuthController::class,'registerAdmin']);
+Route::post('/loginAdmin',[AuthController::class,'loginAdmin']);
 
 // register "employee"
-Route::post('/registerEmployee',[AuthController::class,'RegisterEmployee'])->middleware(['auth:sanctum', 'role:super_admin|permission:manage-users']);;
+Route::post('/registerEmployee',[AuthController::class,'registerEmployee'])->middleware(['auth:sanctum', 'role:super_admin|permission:manage-users']);;
+Route::post('/loginEmployee',[AuthController::class,'loginEmployee']);
 
-
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['AuthenticateUser'])->group(function () {
         Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
 
         Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
         Route::post('/logout',        [AuthController::class, 'logout']);
         Route::post('/edit-profile',       [AuthController::class, 'EditInformation']);
+
+        Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
 
         Route::prefix('complaints')->group(function () {
             Route::post('create', [ComplaintController::class, 'create']);
@@ -64,16 +68,17 @@ Route::post('/registerEmployee',[AuthController::class,'RegisterEmployee'])->mid
     ///=========================
     // EMPLOYEE COMPLAINT ROUTES
     //==========================
-    Route::middleware(['auth:sanctum', 'role:employee'])->prefix('employee')->group(function () {
+    Route::middleware(['AuthenticateEmployee','role:employee'])->prefix('employee')->group(function () {
     Route::get('/complaints', [EmployeeComplaintController::class, 'index'])->middleware('permission:view-complaint');
     Route::patch('/complaints/{complaintId}/status', [EmployeeComplaintController::class, 'updateStatus'])->middleware('permission:update-complaint');
     Route::post('/complaints/{complaintId}/notes', [EmployeeComplaintController::class, 'addNotes'])->middleware('permission:add-complaint-notes');
     Route::post('complaints/{complaintId}/request-information', [EmployeeComplaintController::class, 'RequestAdditionalInformation']);
+    Route::get('logout', [AuthController::class, 'logoutEmployee']);
 });
     ///======================
     // ADMIN COMPLAINT ROUTES
     //=======================
-Route::middleware(['auth:sanctum', 'role:super_admin'])->prefix('admin')->group(function () {
+Route::middleware(['AuthenticateAdmin','role:super_admin'])->prefix('admin')->group(function () {
     Route::get('/complaints', [AdminComplaintController::class, 'index'])
         ->middleware('permission:view-all-complaints');
 
@@ -92,6 +97,7 @@ Route::middleware(['auth:sanctum', 'role:super_admin'])->prefix('admin')->group(
             ->middleware('permission:export-monthly-csv');
         Route::get('/reports/monthly/pdf1', [AdminComplaintController::class, 'monthlyPdf'])
             ->middleware('permission:export-monthly-pdf');
+        Route::get('logout', [AuthController::class, 'logoutAdmin']);
 });
 
  Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv']);

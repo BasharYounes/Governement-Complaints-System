@@ -40,6 +40,19 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+        'employee-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'employees',
+        ],
+        'admin-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -60,9 +73,18 @@ return [
     */
 
     'providers' => [
+
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\User::class,
+        ],
+        'employees' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Employee::class,
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
         ],
 
         // 'users' => [

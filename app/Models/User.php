@@ -14,6 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    protected $guard_name = 'api';
     /**
      * الميزات المستخدمة في النموذج.
      */

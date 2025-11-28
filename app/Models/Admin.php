@@ -13,8 +13,23 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
-class Admin extends Model
+class Admin extends Authenticatable
 {
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+
+    protected $guard_name = 'admin-api';
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        ];
+     /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+
     protected $hidden = [
         'password',
         'remember_token',

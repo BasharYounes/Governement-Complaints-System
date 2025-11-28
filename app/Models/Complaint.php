@@ -32,7 +32,7 @@ class Complaint extends Model
     /**
      * العلاقة مع المستخدم الذي قدم الشكوى.
      */
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class);
     }

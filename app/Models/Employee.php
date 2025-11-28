@@ -12,15 +12,24 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
-class Employee extends Model
+class Employee extends Authenticatable
 {
-     protected $guraded=[];
-     
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+     protected $guard_name = 'employee-api';
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'phone',
+        'image',
+        'government_entity_id',
+        'position',
+    ];
+
      protected $hidden = [
         'password',
         'remember_token',
-        'created_at',
-        'updated_at'
     ];
 
      /**
@@ -50,11 +59,16 @@ class Employee extends Model
         return Storage::url($value);
     }
 
-      // one to many 
+      // one to many
     public function governmentEntity()
-{
-    return $this->belongsTo(GovernmentEntities::class, 'government_entity_id');
-}
+    {
+        return $this->belongsTo(GovernmentEntities::class, 'government_entity_id');
+    }
+
+    public function complaintAuditLogs()
+    {
+        return $this->morphMany(ComplaintAuditLog::class, 'auditable');
+    }
 
 
 
