@@ -63,7 +63,7 @@ class NotificationService
             $messaging = app('firebase.messaging');
 
             $message = CloudMessage::withTarget('token',
-            'dLpAkjRxTtegeO-7Uf8WB3:APA91bEcSiWYjttYHSWIHtxytZi8czsUGHmetRbMTrt7zhvoiVMduEIdKzpooMOMXBogSJP-6otSGJdAHXuDGu0ADvBtensCMmhq0fKgF7IEK-a0bbCS560')
+                $user->fcm_token)
                 ->withNotification([
                     'title' => $content['title'],
                     'body' => $content['body']
