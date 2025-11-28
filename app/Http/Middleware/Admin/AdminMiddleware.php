@@ -27,6 +27,8 @@ class AdminMiddleware
                     "message" => "Unauthorized Access"
                 ], 401);
             }
+            // ensure the default auth guard used by other middleware (eg. Spatie) is the admin guard
+            auth()->shouldUse('admin-api');
         }
 
         return $next($request);

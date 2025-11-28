@@ -4,6 +4,7 @@ namespace App\Observer;
 
 
 use App\Models\Complaint;
+use App\Models\User;
 use App\Traits\DetectsActor;
 use DB;
 
@@ -40,25 +41,10 @@ class ComplaintObserver
             $description = $this->generateDescription($action, $dirty, $original);
             $auditLog = $this->createAuditLog($complaint, $action, $description);
             $this->createAuditDetails($complaint, $original, $dirty);
-        });
-    }
 
-    /**
-     * Handle the Complaint "updated" event.
-     */
-    public function updated(Complaint $complaint): void
-     {
-        $original = $complaint->getOriginal();
-        $dirty = $complaint->getDirty();
-
-        if (empty($dirty)) {
-            return;
-        }
-        $action = $this->determineAction($dirty);
-        $description = $this->generateDescription($action, $dirty, $original);
-        if ($action['Is_status_changed'] === true) {
+             if ($action['Is_status_changed']) {
             event(new \App\Events\GenericNotificationEvent(
-                $complaint->user,
+                User::find($complaint->user_id),
                 'complaint_status_changed',
                 [
                     'reference_number' => $complaint->referance_number,
@@ -67,6 +53,25 @@ class ComplaintObserver
                 ]
             ));
         }
+        });
+    }
+
+    /**
+     * Handle the Complaint "updated" event.
+     */
+    public function updated(Complaint $complaint): void
+     {
+        // $original = $complaint->getOriginal();
+        // $dirty = $complaint->getDirty();
+
+        // if (empty($dirty)) {
+        //     return;
+        // }
+
+        // $action = $this->determineAction($dirty);
+        // $description = $this->generateDescription($action, $dirty, $original);
+        // dd($action);
+
     }
 
     /**
@@ -98,7 +103,7 @@ class ComplaintObserver
                 'complaint_id' => $complaint->id,
                 'auditable_type' => $actor ? get_class($actor) : null,
                 'auditable_id' => $actor?->getKey(),
-                'action' => $action['status'] ,
+                'action' => $action['status'] ?? $action,
                 'description' => $description,
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->header('User-Agent'),

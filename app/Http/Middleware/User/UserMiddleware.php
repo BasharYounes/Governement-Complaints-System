@@ -27,6 +27,9 @@ class UserMiddleware
                     "message" => "Unauthorized Access"
                 ], 401);
             }
+
+            // ensure the default auth guard used by other middleware (eg. Spatie) is the api guard
+            auth()->shouldUse('api');
         }
 
         return $next($request);

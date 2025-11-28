@@ -22,6 +22,7 @@ class HandleGenericNotification
      */
     public function handle(GenericNotificationEvent $event): void
     {
-       
+       $notificationService = new NotificationService();
+       $notificationService->send($event->user, $event->type, $event->data);
     }
 }

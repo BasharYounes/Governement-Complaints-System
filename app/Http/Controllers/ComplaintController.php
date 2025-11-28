@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Attachments\AttachmentRequest;
 use App\Http\Requests\Complaints\ComplaintUpdateRequest;
+use App\Http\Requests\UpdateComplaintStatusRequest;
 use App\Repositories\Attachments\AttachmentRepository;
 use App\Repositories\Complaints\ComplaintRepository;
 use App\Repositories\GovernementEntities\GovernmentEntityRepository;
 use App\Repositories\ReferanceNumberRepository\ReferanceNumberRepository;
 use App\Services\Attachments\AttachmentService;
+use App\Services\EmployeeComplaintService;
 use App\Traits\ApiResponse;
 use App\Http\Requests\Complaints\ComplaintRequest;
 
@@ -24,6 +26,7 @@ class ComplaintController extends Controller
     protected ReferanceNumberRepository $referenceNumberRepository,
     protected GovernmentEntityRepository $governmentEntityRepository,
     protected ComplaintRepository $complaintRepository,
+    protected EmployeeComplaintService $complaintService
     )
     {}
     /**
@@ -61,6 +64,7 @@ class ComplaintController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(ComplaintUpdateRequest $request,$id)
     {
         $updatedComplaint = $this->complaintRepository->updateComplaint($id, $request->validated());
