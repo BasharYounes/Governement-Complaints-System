@@ -60,18 +60,12 @@ class ComplaintObserver
      * Handle the Complaint "updated" event.
      */
     public function updated(Complaint $complaint): void
-     {
-        // $original = $complaint->getOriginal();
-        // $dirty = $complaint->getDirty();
-
-        // if (empty($dirty)) {
-        //     return;
-        // }
-
-        // $action = $this->determineAction($dirty);
-        // $description = $this->generateDescription($action, $dirty, $original);
-        // dd($action);
-
+    {
+        event(new \App\Events\GenericNotificationEvent(
+                User::find($complaint->user_id),
+                'updateByUser',
+                []
+            ));
     }
 
     /**
