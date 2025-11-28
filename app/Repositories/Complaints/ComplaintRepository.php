@@ -8,7 +8,8 @@ class ComplaintRepository
 {
     public function createComplaint(array $data,string $referenceNumber): Complaint
     {
-        $data['user_id'] = auth()->id();
+        // dd(auth()->guard('api')->id());
+        $data['user_id'] = auth()->guard('api')->id();
         $data['reference_number'] = $referenceNumber;
         return Complaint::create($data);
     }

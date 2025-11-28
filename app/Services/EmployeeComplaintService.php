@@ -6,6 +6,7 @@ use App\Models\Complaint;
 use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
 use App\Models\Attachment;
+use App\Repositories\Complaints\ComplaintRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,6 +14,9 @@ use Illuminate\Http\Request;
 
 class EmployeeComplaintService
 {
+    public function __construct(protected ComplaintRepository $complaintRepository)
+    {
+    }
     /**
      * Allowed status transitions for complaints.
      */
@@ -49,6 +53,8 @@ class EmployeeComplaintService
     {
         $employee = Auth::user();
 
+        // dd($employee);
+
         $complaint = Complaint::where('id', $complaintId)
                               ->where('government_entity_id', $employee->government_entity_id)
                               ->first();
@@ -64,37 +70,9 @@ class EmployeeComplaintService
             throw new \Exception("الحالة المرسلة غير صالحة.");
         }
 
-        return DB::transaction(function () use ($complaint, $currentStatus, $newStatus, $notes, $employee) {
-            // Audit log
-            $auditLog = ComplaintAuditLog::create([
-                'complaint_id' => $complaint->id,
-                'user_id'      => $employee->id,
-                'action'       => 'updated',
-                'description'  => "Status changed from $currentStatus to $newStatus",
-                'ip_address'   => request()->ip(),
-                'user_agent'   => request()->userAgent(),
-            ]);
+        $newComplaint = $this->complaintRepository->updateComplaint($complaintId, ['status' => $newStatus]);
 
-            // Audit detail
-            ComplaintAuditDetail::create([
-                'audit_log_id' => $auditLog->id,
-                'field_name'   => 'status',
-                'old_value'    => $currentStatus,
-                'new_value'    => $newStatus,
-                'notes'        => $notes,
-            ]);
-
-            // Update complaint
-            $complaint->status = $newStatus;
-            $complaint->save();
-
-            // Add notes if any
-            if ($notes) {
-                $this->addComplaintNotes($complaint->id, $notes);
-            }
-
-            return $complaint->fresh();
-        });
+        return $newComplaint;
     }
 
     /**

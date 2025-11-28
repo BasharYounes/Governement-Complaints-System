@@ -61,7 +61,8 @@ class EmployeeComplaintController extends Controller
 
         return $this->success(
             'تم تحديث حالة الشكوى بنجاح',
-            $complaint
+            $complaint,
+            200
         );
     }
 

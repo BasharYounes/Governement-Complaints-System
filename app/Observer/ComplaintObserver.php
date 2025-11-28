@@ -48,25 +48,25 @@ class ComplaintObserver
      */
     public function updated(Complaint $complaint): void
      {
-        // $original = $complaint->getOriginal();
-        // $dirty = $complaint->getDirty();
+        $original = $complaint->getOriginal();
+        $dirty = $complaint->getDirty();
 
-        // if (empty($dirty)) {
-        //     return;
-        // }
-        // $action = $this->determineAction($dirty);
-        // $description = $this->generateDescription($action, $dirty, $original);
-        // if ($action ==='status_changed') {
-        //     event(new \App\Events\GenericNotificationEvent(
-        //         $complaint->user,
-        //         'complaint_status_changed',
-        //         [
-        //             'reference_number' => $complaint->referance_number,
-        //             'old_status' => $original['status'] ?? 'unknown',
-        //             'new_status' => $dirty['status'],
-        //         ]
-        //     ));
-        // }
+        if (empty($dirty)) {
+            return;
+        }
+        $action = $this->determineAction($dirty);
+        $description = $this->generateDescription($action, $dirty, $original);
+        if ($action['Is_status_changed'] === true) {
+            event(new \App\Events\GenericNotificationEvent(
+                $complaint->user,
+                'complaint_status_changed',
+                [
+                    'reference_number' => $complaint->referance_number,
+                    'old_status' => $original['status'] ?? 'unknown',
+                    'new_status' => $dirty['status'],
+                ]
+            ));
+        }
     }
 
     /**
@@ -98,7 +98,7 @@ class ComplaintObserver
                 'complaint_id' => $complaint->id,
                 'auditable_type' => $actor ? get_class($actor) : null,
                 'auditable_id' => $actor?->getKey(),
-                'action' => $action,
+                'action' => $action['status'] ,
                 'description' => $description,
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->header('User-Agent'),
@@ -179,10 +179,10 @@ class ComplaintObserver
     {
         // إذا كان التغيير فقط في الحالة
         if (count($dirty) === 1 && array_key_exists('status', $dirty)) {
-            return 'status_changed';
+            return ['status'=>'updated','Is_status_changed'=> true];
         }
 
-        return 'updated';
+        return ['status'=>'updated','Is_status_changed'=> false];
     }
 
     /**
@@ -190,12 +190,12 @@ class ComplaintObserver
      */
     private function generateDescription($action, $dirty, $original)
     {
-        if ($action === 'status_changed') {
+        if ($action['Is_status_changed'] === true) {
             $oldStatus = $original['status'] ?? 'unknown';
             $newStatus = $dirty['status'];
             return "تم تغيير حالة الشكوى من {$this->getStatusText($oldStatus)} إلى {$this->getStatusText($newStatus)}";
         }
-        if ($action === 'updated') {
+        if ($action['status'] === 'updated') {
             $changedFields = array_keys($dirty);
             if (count($changedFields) === 1) {
                 return "تم تحديث حقل {$this->getFieldLabel($changedFields[0])}";

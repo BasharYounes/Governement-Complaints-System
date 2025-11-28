@@ -19,7 +19,7 @@ class AttachmentRepository
     {
         $info = $this->attachmentService->extractInfoFromFile($attachmentRequest['file']);
         $info['complaint_id'] = $id;
-        $info['uploaded_by'] = auth()->id();
+        $info['uploaded_by'] = auth()->guard('api')->id();
         // Logic to upload attachment
         $info['file_path'] = $attachmentRequest['file']->store('attachments', 'public');
         return Attachment::create($info);

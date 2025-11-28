@@ -59,14 +59,15 @@ class AuthController extends Controller
 
      public function registerEmployee(registerEmployeeRequest $registerEmployeeRequest)
     {
-        DB::transaction(function () use ($registerEmployeeRequest) {
+        $employee = DB::transaction(function () use ($registerEmployeeRequest) {
         $employee = $this->complaintEmployeeRepository->createEmployee($registerEmployeeRequest->validated());
         $employee->assignRole('employee');
-        return $this->success('Employee Registered Successfully', [
+        return $employee;
+        });
+        return$this->success('Employee Registered Successfully', [
             'token' => $employee->createToken('employee_token')->plainTextToken,
             'employee' => $employee
             ]);
-        });
     }
 
     public function loginEmployee(loginEmployeeRequest $loginEmployeeRequest)
