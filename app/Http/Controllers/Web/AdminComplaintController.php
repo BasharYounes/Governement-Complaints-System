@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
+use App\Http\Controllers\Controller;
 
 use App\Events\GenericNotificationEvent;
 use App\Models\Complaint;
@@ -137,16 +138,13 @@ public function statistics()
 
 public function monthlyPdf(Request $request)
 {
-    // إذا ما وصل month → ناخد الشهر الحالي
     $month = $request->month ?? now()->format('Y-m');
 
-    // الحصول على البيانات
     $complaints = $this->exportService->getMonthlyComplaints($month);
 
-    // توليد مسار الملف
     $filePath = $this->exportService->exportPdf($complaints, $month);
 
-    // إرسال رابط التحميل (API Friendly)
+
     return response()->json([
         'success' => true,
         'url' => asset($filePath)

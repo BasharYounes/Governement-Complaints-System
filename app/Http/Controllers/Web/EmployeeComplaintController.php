@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Web;
+use App\Http\Controllers\Controller;
 use App\Events\GenericNotificationEvent;
 use App\Http\Requests\UpdateComplaintStatusRequest;
 use App\Repositories\ComplaintEmployeeRepository;
