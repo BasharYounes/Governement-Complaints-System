@@ -85,18 +85,8 @@ class ComplaintController extends Controller
      */
     public function update(ComplaintUpdateRequest $request,$id)
     {
-        $User = auth()->user();
-        $lockKey = 'complaint_update_'.$id;
-
-        $lockOwner = Cache::get($lockKey);
-
-        if ($lockOwner && $lockOwner !== $User->id) {
-            return $this->error('The time allowed for editing has expired Or This complaint is currently being edited by another user.',null,403);
-        }
-
-        $updatedComplaint = $this->complaintRepository->updateComplaint($id, $request->validated());
-
-        Cache::forget($lockKey);
+        $complaint = $this->complaintRepository->getComplaintById($id);
+        $updatedComplaint = $this->complaintRepository->updateComplaint($id,$request->validated());
 
     return $this->success('Complaint updated successfully', $updatedComplaint, 200);
     }

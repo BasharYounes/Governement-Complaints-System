@@ -7,6 +7,8 @@ use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
 use App\Models\Attachment;
 use App\Repositories\Complaints\ComplaintRepository;
+use App\Traits\ApiResponse;
+use Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,6 +16,7 @@ use Illuminate\Http\Request;
 
 class EmployeeComplaintService
 {
+    use ApiResponse;
     public function __construct(protected ComplaintRepository $complaintRepository)
     {
     }
@@ -45,15 +48,13 @@ class EmployeeComplaintService
      * Update complaint status with validation and audit logging
      *
      * @param int $complaintId
-     * @param string $newStatus
+     * @param array $newStatus
      * @param string|null $notes
      * @return Complaint
      */
-    public function updateComplaintStatus(int $complaintId, string $newStatus, ?string $notes = null): Complaint
+    public function updateComplaintStatus(int $complaintId, array $newStatus, ?string $notes = null)
     {
-        $employee = Auth::user();
-
-        // dd($employee);
+        $employee = auth()->user();
 
         $complaint = Complaint::where('id', $complaintId)
                               ->where('government_entity_id', $employee->government_entity_id)

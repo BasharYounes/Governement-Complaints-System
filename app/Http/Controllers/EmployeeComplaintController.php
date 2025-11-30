@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateComplaintStatusRequest;
 use App\Repositories\ComplaintEmployeeRepository;
 use App\Repositories\Complaints\ComplaintRepository;
 use App\Services\EmployeeComplaintService;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\ApiResponse;
@@ -54,9 +55,21 @@ class EmployeeComplaintController extends Controller
      */
     public function updateStatus(UpdateComplaintStatusRequest $request, int $complaintId)
     {
+        $employee = auth()->user();
+        $lockKey = 'complaint_update_'.$complaintId;
+
+        $lockOwner = Cache::get($lockKey);
+
+        if ($lockOwner && $lockOwner !== $employee->id) {
+            return $this->error('The time allowed for editing has expired Or This complaint is currently being edited by another user.',null,403);
+        }
+
+
+        Cache::forget($lockKey);
+
         $complaint = $this->complaintService->updateComplaintStatus(
             $complaintId,
-            $request->status
+            $request->validated()
         );
 
         return $this->success(
