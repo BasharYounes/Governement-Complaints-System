@@ -15,7 +15,6 @@ use App\Traits\ApiResponse;
 
 class EmployeeComplaintController extends Controller
 {
-    use ApiResponse;
 
     protected EmployeeComplaintService $complaintService;
 

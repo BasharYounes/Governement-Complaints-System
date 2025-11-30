@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class GovernmentEntitiesController extends Controller
 {
-    use ApiResponse;
 
     public function __construct(protected GovernmentEntityRepository $governmentEntityRepository)
     {

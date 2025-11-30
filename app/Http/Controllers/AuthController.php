@@ -27,7 +27,6 @@ use App\Http\Requests\AuthAdmin\SignInRequest as loginAdminRequest;
 
 class AuthController extends Controller
 {
-    use ApiResponse;
 
     public function __construct(
         protected AuthService $authService,

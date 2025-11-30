@@ -12,7 +12,6 @@ use App\Traits\ApiResponse;
 
 class NotificationController extends Controller
 {
-    use ApiResponse;
     public function __construct(public NotificationRepository $notificationRepository) {}
 
     public function index(Request $request)

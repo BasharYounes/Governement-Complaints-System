@@ -2,12 +2,15 @@
 
 namespace App\Traits;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 
 trait ApiResponse
 {
+    use AuthorizesRequests, ValidatesRequests;
      /**
-     * 
+     *
      *
      * @param string $message
      * @param mixed $data
@@ -27,7 +30,7 @@ trait ApiResponse
     }
 
     /**
-     * 
+     *
      *
      * @param string $message
      * @param mixed $errors
@@ -44,5 +47,5 @@ trait ApiResponse
             'message' => $message,
             'errors' => $errors,
         ], $statusCode);
-    }    
+    }
 }

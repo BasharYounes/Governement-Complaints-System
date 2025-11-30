@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Attachments\AttachmentRepository;
 use Illuminate\Support\Facades\Storage;
-
+use App\Traits\ApiResponse;
 class AttachmentController extends Controller
 {
-
     public function __construct(protected AttachmentRepository $attachmentRepository)
     {
         //
@@ -17,10 +16,13 @@ class AttachmentController extends Controller
     {
         $attachment = $this->attachmentRepository->getAttachmentById($id);
 
-        if (! Storage::exists($attachment->file_path)) {
-            return $this->error('File not found in storage.', 404);
+        // files are stored under the `public` disk (storage/app/public)
+        if (!Storage::disk('public')->exists($attachment->file_path)) {
+            return $this->error('File not found in storage.', null, 404);
         }
 
-        return Storage::response($attachment->file_path);
+        $path = Storage::disk('public')->path($attachment->file_path);
+
+        return response()->file($path);
     }
 }

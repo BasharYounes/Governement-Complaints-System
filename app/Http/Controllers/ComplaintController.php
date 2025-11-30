@@ -17,7 +17,6 @@ use Cache;
 class ComplaintController extends Controller
 {
     // Using the ApiResponse trait for standardized API responses
-    use ApiResponse;
     /**
      * Constructor to initialize repositories and services.
      */
@@ -85,7 +84,6 @@ class ComplaintController extends Controller
      */
     public function update(ComplaintUpdateRequest $request,$id)
     {
-        $complaint = $this->complaintRepository->getComplaintById($id);
         $updatedComplaint = $this->complaintRepository->updateComplaint($id,$request->validated());
 
     return $this->success('Complaint updated successfully', $updatedComplaint, 200);

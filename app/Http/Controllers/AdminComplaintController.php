@@ -15,8 +15,6 @@ use App\Exports\ComplaintsExport;
 
 class AdminComplaintController extends Controller
 {
-    use ApiResponse;
-
     protected AdminComplaintService $complaintService;
     protected ExportReportsService $exportService;
    public function __construct(AdminComplaintService $complaintService , ExportReportsService $exportService)

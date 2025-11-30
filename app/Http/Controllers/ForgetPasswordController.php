@@ -22,7 +22,6 @@ use App\Services\GenerateCode;
 
 class ForgetPasswordController extends Controller
 {
-    use ApiResponse;
 
     public function __construct(
         protected GenerateCode $codeService,
