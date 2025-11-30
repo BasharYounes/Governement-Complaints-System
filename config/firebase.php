@@ -9,7 +9,7 @@ return [
      * ------------------------------------------------------------------------
      */
 
-    'default' => env('FIREBASE_PROJECT', 'buyro-app'),
+    'default' => env('FIREBASE_PROJECT', 'complaints-app'),
 
     /*
      * ------------------------------------------------------------------------
@@ -18,7 +18,7 @@ return [
      */
 
     'projects' => [
-        'buyro-app' => [
+        'complaints-app' => [
 
             /*
              * ------------------------------------------------------------------------
@@ -26,7 +26,7 @@ return [
              * ------------------------------------------------------------------------
              */
 
-            'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase/serviceacountKey.json')),
+            'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase/firebase.json')),
 
             /*
              * ------------------------------------------------------------------------
@@ -55,7 +55,7 @@ return [
              */
 
             'database' => [
-                'url' => env('FIREBASE_DATABASE_URL', 'https://buyro-app.firebaseio.com'),
+                'url' => env('FIREBASE_DATABASE_URL', 'https://complaints-app.firebaseio.com'),
             ],
 
             'dynamic_links' => [
@@ -69,7 +69,7 @@ return [
              */
 
             'storage' => [
-                'default_bucket' => env('FIREBASE_STORAGE_DEFAULT_BUCKET', 'buyro-app.appspot.com'),
+                'default_bucket' => env('FIREBASE_STORAGE_DEFAULT_BUCKET', 'complaints-app.appspot.com'),
             ],
 
             /*
