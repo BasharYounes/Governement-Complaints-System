@@ -2,18 +2,18 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
+use App\Models\Employee;
 use App\Models\GovernmentEntities;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
-use App\Models\GovernmentEntity;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::firstOrCreate(
+        $admin = Admin::firstOrCreate(
             ['email' => 'batoulsubuh@gmail.com'],
             [
                 'name' => 'Batoul',
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
 
         $firstEntity = GovernmentEntities::first();
         if($firstEntity) {
-            $employee = User::firstOrCreate(
+            $employee = Employee::firstOrCreate(
                 ['email' => 'batoul1@gmail.com'],
                 [
                     'name' => 'BatoulSB',
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
             'name' => 'Batoul Subuh',
             'email' => 'baraaalali553@gmail.com',
             'password' => Hash::make('123456789'),
-            'government_entity_id' => null, 
+            'government_entity_id' => null,
         ]);
 
         $citizen->assignRole('citizen');

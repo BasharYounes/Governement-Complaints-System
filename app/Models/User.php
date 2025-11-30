@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Events\AdPublishedEvent;
-use App\Events\GenericNotificationEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,7 +25,6 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'image',
         'password',
         'email_verified_at',
         'phone',
@@ -100,6 +96,14 @@ class User extends Authenticatable
     public function attachments()
     {
         return $this->hasMany(Attachment::class);
+    }
+
+    /**
+     * العلاقة مع الإشعارات.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 
 }

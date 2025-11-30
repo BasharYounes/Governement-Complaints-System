@@ -5,6 +5,7 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\EmployeeComplaintController;
 use App\Http\Controllers\GovernmentEntitiesController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgetPasswordController;
@@ -36,33 +37,37 @@ Route::post('/loginAdmin',[AuthController::class,'loginAdmin']);
 // register "employee"
 Route::post('/loginEmployee',[AuthController::class,'loginEmployee']);
 
-    Route::middleware(['AuthenticateUser'])->group(function () {
-        Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
+Route::middleware(['AuthenticateUser'])->group(function () {
+    Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
 
-        Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
-        Route::post('/logout',        [AuthController::class, 'logout']);
-        Route::post('/edit-profile',       [AuthController::class, 'EditInformation']);
+    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
+    Route::post('/logout',  [AuthController::class, 'logout']);
+    Route::post('/edit-profile',  [AuthController::class, 'EditInformation']);
 
-        Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
+    Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
 
-        Route::prefix('complaints')->group(function () {
-            Route::post('create', [ComplaintController::class, 'create']);
-            Route::get('show/{id}', [ComplaintController::class, 'show']);
-            Route::post('update/{id}', [ComplaintController::class, 'update']);
-            Route::delete('delete/{id}', [ComplaintController::class, 'destroy']);
-            Route::post('add-attachment/{id}', [ComplaintController::class, 'addAttachment']);
-            Route::get('get-user-complaints', [ComplaintController::class, 'getComplaintsforUser']);
-        });
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/show-notification/{id}', [NotificationController::class, 'show']);
+    Route::post('/mark-is-read', [NotificationController::class,'markAsRead']);
 
-        Route::prefix('government-entities')->group(function () {
-            Route::get('/all-entities', [GovernmentEntitiesController::class, 'index']);
-        });
-
-        Route::prefix('attachments')->group(function () {
-            Route::get('/show/{id}', [AttachmentController::class, 'show']);
-        });
-
+    Route::prefix('complaints')->group(function () {
+        Route::post('create', [ComplaintController::class, 'create']);
+        Route::get('show/{id}', [ComplaintController::class, 'show']);
+        Route::post('update/{id}', [ComplaintController::class, 'update']);
+        Route::delete('delete/{id}', [ComplaintController::class, 'destroy']);
+        Route::post('add-attachment/{id}', [ComplaintController::class, 'addAttachment']);
+        Route::get('get-user-complaints', [ComplaintController::class, 'getComplaintsforUser']);
     });
+
+    Route::prefix('government-entities')->group(function () {
+        Route::get('/all-entities', [GovernmentEntitiesController::class, 'index']);
+    });
+
+    Route::prefix('attachments')->group(function () {
+        Route::get('/show/{id}', [AttachmentController::class, 'show']);
+    });
+
+});
 
     ///=========================
     // EMPLOYEE COMPLAINT ROUTES
@@ -70,6 +75,7 @@ Route::post('/loginEmployee',[AuthController::class,'loginEmployee']);
     Route::middleware(['AuthenticateEmployee','role:employee'])->prefix('employee')->group(function () {
     Route::get('/complaints', [EmployeeComplaintController::class, 'index'])->middleware('permission:view-complaint');
     Route::post('/complaints/{complaintId}', [EmployeeComplaintController::class, 'updateStatus'])->middleware('permission:update-complaint');
+    Route::post('check-editing',[ComplaintController::class,'edit']);
     Route::post('/complaints/{complaintId}/notes', [EmployeeComplaintController::class, 'addNotes'])->middleware('permission:add-complaint-notes');
     Route::post('complaints/{complaintId}/request-information', [EmployeeComplaintController::class, 'RequestAdditionalInformation']);
     Route::get('logout', [AuthController::class, 'logoutEmployee']);

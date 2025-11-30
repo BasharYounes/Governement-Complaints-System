@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Attachments\AttachmentRequest;
 use App\Http\Requests\Complaints\ComplaintUpdateRequest;
-use App\Http\Requests\UpdateComplaintStatusRequest;
 use App\Repositories\Attachments\AttachmentRepository;
 use App\Repositories\Complaints\ComplaintRepository;
 use App\Repositories\GovernementEntities\GovernmentEntityRepository;
@@ -13,6 +12,7 @@ use App\Services\Attachments\AttachmentService;
 use App\Services\EmployeeComplaintService;
 use App\Traits\ApiResponse;
 use App\Http\Requests\Complaints\ComplaintRequest;
+use Cache;
 
 class ComplaintController extends Controller
 {
@@ -60,14 +60,44 @@ class ComplaintController extends Controller
         $complaint = $this->complaintRepository->getComplaintById($id);
     return $this->success('Complaint retrieved successfully', $complaint, 200);
     }
-
     /**
-     * Update the specified resource in storage.
+     * Check if the complaint is being edited by another employee.
      */
+    public function edit($id)
+    {
+        $User = auth()->user();
+        $lockKey = 'complaint_update_'.$id;
 
+        $lockOwner = Cache::get($lockKey);
+
+        if ($lockOwner && $lockOwner !== $User->id) {
+            return $this->error('This complaint is currently being edited by another employee.',null, 403);
+        }
+
+        Cache::put($lockKey, $User->id, now()->addMinutes(10));
+
+        $complaint = $this->complaintRepository->getComplaintById($id);
+
+    return $this->success('Complaint allowed editing', $complaint, 200);
+    }
+    /**
+     * Update the specified resource in storage after checking for edit locks.
+     */
     public function update(ComplaintUpdateRequest $request,$id)
     {
+        $User = auth()->user();
+        $lockKey = 'complaint_update_'.$id;
+
+        $lockOwner = Cache::get($lockKey);
+
+        if ($lockOwner && $lockOwner !== $User->id) {
+            return $this->error('The time allowed for editing has expired Or This complaint is currently being edited by another user.',null,403);
+        }
+
         $updatedComplaint = $this->complaintRepository->updateComplaint($id, $request->validated());
+
+        Cache::forget($lockKey);
+
     return $this->success('Complaint updated successfully', $updatedComplaint, 200);
     }
 
