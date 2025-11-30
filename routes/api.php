@@ -76,7 +76,6 @@ Route::middleware(['AuthenticateUser'])->group(function () {
     Route::get('/complaints', [EmployeeComplaintController::class, 'index'])->middleware('permission:view-complaint');
     Route::post('/complaints/{complaintId}', [EmployeeComplaintController::class, 'updateStatus'])->middleware('permission:update-complaint');
     Route::post('check-editing',[ComplaintController::class,'edit']);
-    Route::post('/complaints/{complaintId}/notes', [EmployeeComplaintController::class, 'addNotes'])->middleware('permission:add-complaint-notes');
     Route::post('complaints/{complaintId}/request-information', [EmployeeComplaintController::class, 'RequestAdditionalInformation']);
     Route::get('logout', [AuthController::class, 'logoutEmployee']);
 });

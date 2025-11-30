@@ -79,29 +79,6 @@ class EmployeeComplaintController extends Controller
         );
     }
 
-    /**
-     * Add notes to a complaint.
-     *
-     * @param Request $request
-     * @param int $complaintId
-     */
-    public function addNotes(Request $request, int $complaintId)
-    {
-        $request->validate([
-            'notes' => 'required|string',
-        ]);
-
-        $complaint = $this->complaintService->addComplaintNotes(
-            $complaintId,
-            $request->notes
-        );
-
-        return $this->success(
-            'تمت إضافة الملاحظات بنجاح',
-            $complaint
-        );
-    }
-
     public function RequestAdditionalInformation($id,Request $request)
     {
         $request->validate([
