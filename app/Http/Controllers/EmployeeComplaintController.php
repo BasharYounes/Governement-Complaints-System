@@ -64,12 +64,13 @@ class EmployeeComplaintController extends Controller
         }
 
 
-        Cache::forget($lockKey);
-
         $complaint = $this->complaintService->updateComplaintStatus(
             $complaintId,
             $request->validated()
         );
+
+        Cache::forget($lockKey);
+
 
         return $this->success(
             'تم تحديث حالة الشكوى بنجاح',
@@ -91,5 +92,17 @@ class EmployeeComplaintController extends Controller
             "RequestAdditionalInformation",
             ["reference_number" => $complaint->reference_number]
         ));
+    }
+    public function getAllComplaint()
+    {
+        return $this->success('All complaints retrieved successfully',
+         $this->complaintRepository->allComplaint(),
+         200);
+    }
+
+    public function show($id)
+    {
+        $complaint = $this->complaintRepository->getComplaintById($id);
+        return $this->success('Complaint retrieved successfully', $complaint, 200);
     }
 }

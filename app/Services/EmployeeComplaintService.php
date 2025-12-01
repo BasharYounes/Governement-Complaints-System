@@ -52,7 +52,7 @@ class EmployeeComplaintService
      * @param string|null $notes
      * @return Complaint
      */
-    public function updateComplaintStatus(int $complaintId, array $newStatus, ?string $notes = null)
+    public function updateComplaintStatus(int $complaintId, array $data, ?string $notes = null)
     {
         $employee = auth()->user();
 
@@ -63,8 +63,8 @@ class EmployeeComplaintService
         if (!$complaint) {
             throw new ModelNotFoundException("Complaint not found or you don't have access.");
         }
-
         $currentStatus = $complaint->status;
+        $newStatus = $data['status'];
 
         // Check allowed transitions
         if (!in_array($newStatus, $this->allowedTransitions[$currentStatus])) {

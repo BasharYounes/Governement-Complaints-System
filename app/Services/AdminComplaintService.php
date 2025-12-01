@@ -143,7 +143,7 @@ class AdminComplaintService
     }
     public function listAllEmployees()
 {
-    return \App\Models\User::whereNotNull('government_entity_id')
+    return \App\Models\Employee::whereNotNull('government_entity_id')
         ->with('governmentEntity')
         ->orderBy('name')
         ->get();

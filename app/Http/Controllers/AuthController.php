@@ -93,6 +93,7 @@ class AuthController extends Controller
     public function registerAdmin(registerAdminRequest $registerAdminRequest)
     {
         $admin = DB::transaction(function () use ($registerAdminRequest) {
+            
             $admin = $this->adminRepository->createAdmin($registerAdminRequest->validated());
             $admin->assignRole('super_admin');
             return $admin;

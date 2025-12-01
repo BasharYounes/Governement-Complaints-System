@@ -49,4 +49,9 @@ class ComplaintRepository
     {
         return auth()->user()->complaints()->with('attachments')->get();
     }
+
+    public function allComplaint()
+    {
+        return Complaint::with('attachments')->where('government_entity_id', auth()->user()->government_entity_id)->paginate(10);
+    }
 }

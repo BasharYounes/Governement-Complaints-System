@@ -74,10 +74,12 @@ Route::middleware(['AuthenticateUser'])->group(function () {
     //==========================
     Route::middleware(['AuthenticateEmployee','role:employee'])->prefix('employee')->group(function () {
     Route::get('/complaints', [EmployeeComplaintController::class, 'index'])->middleware('permission:view-complaint');
-    Route::post('/complaints/{complaintId}', [EmployeeComplaintController::class, 'updateStatus'])->middleware('permission:update-complaint');
-    Route::post('check-editing',[ComplaintController::class,'edit']);
+    Route::post('/update-complaints/{complaintId}', [EmployeeComplaintController::class, 'updateStatus'])->middleware('permission:update-complaint');
+    Route::post('check-editing/{complaintId}',[ComplaintController::class,'edit']);
     Route::post('complaints/{complaintId}/request-information', [EmployeeComplaintController::class, 'RequestAdditionalInformation']);
     Route::get('logout', [AuthController::class, 'logoutEmployee']);
+    Route::get('/all-complaints', [EmployeeComplaintController::class, 'getAllComplaint'])->middleware('permission:view-complaints');
+    Route::get('/show-complaint/{complaintId}', [EmployeeComplaintController::class, 'show'])->middleware('permission:view-complaint');
 });
     ///======================
     // ADMIN COMPLAINT ROUTES
@@ -99,13 +101,15 @@ Route::middleware(['AuthenticateAdmin','role:super_admin'])->prefix('admin')->gr
         ->middleware('permission:view-all-complaint-logs');
         Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv'])
             ->middleware('permission:export-monthly-csv');
-        Route::get('/reports/monthly/pdf1', [AdminComplaintController::class, 'monthlyPdf'])
+        Route::get('/reports/monthly/pdf', [AdminComplaintController::class, 'monthlyPdf'])
             ->middleware('permission:export-monthly-pdf');
         Route::get('logout', [AuthController::class, 'logoutAdmin']);
 
-        Route::post('/registerEmployee',[AuthController::class,'registerEmployee'])->middleware(['auth:sanctum', 'role:super_admin|permission:manage-users']);;
+        Route::post('/registerEmployee',[AuthController::class,'registerEmployee'])->middleware(['auth:sanctum', 'role:super_admin|permission:manage-users']);
+
+        // Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv']);
+        // Route::get('/reports/monthly/pdf', [AdminComplaintController::class, 'monthlyPdf']);
 
 });
 
- Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv']);
-  Route::get('/reports/monthly/pdf', [AdminComplaintController::class, 'monthlyPdf']);
+
