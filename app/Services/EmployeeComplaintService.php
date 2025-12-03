@@ -52,29 +52,39 @@ class EmployeeComplaintService
      * @param string|null $notes
      * @return Complaint
      */
-    public function updateComplaintStatus(int $complaintId, array $data, ?string $notes = null)
-    {
-        $employee = auth()->user();
+   public function updateComplaintStatus(int $complaintId, string $newStatus, ?string $notes = null)
+{
+    $employee = auth()->user();
 
-        $complaint = Complaint::where('id', $complaintId)
-                              ->where('government_entity_id', $employee->government_entity_id)
-                              ->first();
+    $complaint = Complaint::where('id', $complaintId)
+                          ->where('government_entity_id', $employee->government_entity_id)
+                          ->first();
 
-        if (!$complaint) {
-            throw new ModelNotFoundException("Complaint not found or you don't have access.");
-        }
-        $currentStatus = $complaint->status;
-        $newStatus = $data['status'];
-
-        // Check allowed transitions
-        if (!in_array($newStatus, $this->allowedTransitions[$currentStatus])) {
-            throw new \Exception("الحالة المرسلة غير صالحة.");
-        }
-
-        $newComplaint = $this->complaintRepository->updateComplaint($complaintId, ['status' => $newStatus]);
-
-        return $newComplaint;
+    if (!$complaint) {
+        throw new ModelNotFoundException("Complaint not found or you don't have access.");
     }
+
+    $currentStatus = $complaint->status;
+
+    //  Check if currentStatus exists in allowedTransitions
+    if (!array_key_exists($currentStatus, $this->allowedTransitions)) {
+        throw new \Exception("الحالة الحالية غير معروفة في النظام.");
+    }
+
+    //  Check if newStatus is allowed for this currentStatus
+    if (!in_array($newStatus, $this->allowedTransitions[$currentStatus])) {
+        throw new \Exception("الحالة المرسلة غير صالحة.");
+    }
+
+    $newComplaint = $this->complaintRepository->updateComplaint($complaintId, [
+        'status' => $newStatus,
+        'notes'  => $notes
+    ]);
+
+    return $newComplaint;
+}
+
+
 
     /**
      * Add notes to a complaint and log the change

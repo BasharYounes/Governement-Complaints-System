@@ -11,7 +11,7 @@ class ComplaintsSeeder extends Seeder
     {
         $complaints = [
             [
-                'user_id' => 3, 
+                'user_id' => 1, 
                 'description' => 'تم انقطاع المياه منذ 24 ساعة ولم يتم التزويد بعد.',
                 'government_entity_id' => 1,
                 'status' => 'new',
@@ -20,7 +20,7 @@ class ComplaintsSeeder extends Seeder
                 'reference_number' => 'REF-001',
             ],
             [
-                'user_id' => 3,
+                'user_id' => 1,
                 'description' => 'الطلب تم تقديمه منذ أسبوع بدون تحديث.',
                 'government_entity_id' => 2,
                 'status' => 'in_progress',
@@ -29,7 +29,7 @@ class ComplaintsSeeder extends Seeder
                 'reference_number' => 'REF-002',
             ],
             [
-                'user_id' => 3,
+                'user_id' => 1,
                 'description' => 'هناك رسوم إضافية لم يتم توضيحها.',
                 'government_entity_id' => 3,
                 'status' => 'completed',
@@ -38,7 +38,7 @@ class ComplaintsSeeder extends Seeder
                 'reference_number' => 'REF-003',
             ],
             [
-                'user_id' => 3,
+                'user_id' => 1,
                 'description' => 'عدم التزام بعض المدارس بمواعيد الدوام الرسمية.',
                 'government_entity_id' => 4,
                 'status' => 'rejected',

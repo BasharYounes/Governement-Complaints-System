@@ -57,13 +57,13 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminPermissions = [
             'view-all-complaints',
             'view-employees',
-            'view-statistics',
-            'export-monthly-pdf',
-            'export-monthly-csv',
             'view-complaint-audit-logs',
+            'view-statistics',
             'view-all-complaint-logs',
-            'manage-users',
-
+            'export-monthly-csvexport-monthly-csv',
+            'export-monthly-pdf', 
+            'logout-admin',
+            'manage-users',  
         ];
 
         foreach ($adminPermissions as $perm) {
@@ -78,9 +78,14 @@ class RolesAndPermissionsSeeder extends Seeder
         $employeePermissions = [
             'view-complaint',
             'update-complaint',
-            'add-complaint-notes',
+            'checkForEditingcomplaint',
+            'RequestAdditionalInformation',
+            'logout-employee',
             'view-complaints',
             'view-complaint',
+            'add-complaint-notes',
+            'view-complaint-audit-logs',
+            
         ];
 
         foreach ($employeePermissions as $perm) {

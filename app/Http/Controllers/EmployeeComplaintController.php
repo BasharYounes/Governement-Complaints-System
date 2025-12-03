@@ -66,7 +66,8 @@ class EmployeeComplaintController extends Controller
 
         $complaint = $this->complaintService->updateComplaintStatus(
             $complaintId,
-            $request->validated()
+            $request->validated('status'),
+           $request->validated('notes') ?? null
         );
 
         Cache::forget($lockKey);

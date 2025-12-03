@@ -18,7 +18,7 @@ class AdminComplaintService
      */
     public function listAllComplaints(): Collection
     {
-        return Complaint::with(['users', 'governmentEntity', 'attachments']) // use correct relationship name
+        return Complaint::with(['users', 'governmentEntity', 'attachments']) 
             ->orderByDesc('created_at')
             ->get();
     }
@@ -157,11 +157,11 @@ public function listAllComplaintLogs()
 {
     // Load complaints with related user, government entity, attachments, audit logs and audit details
     return Complaint::with([
-        'user',
+        'users',
         'governmentEntity',
         'attachments',
         'auditLogs' => function ($query) {
-            $query->with(['user', 'details'])->orderBy('created_at', 'desc');
+            $query->with(['users', 'details'])->orderBy('created_at', 'desc');
         }
     ])->orderByDesc('created_at')->get();
 }
