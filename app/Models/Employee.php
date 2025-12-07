@@ -70,6 +70,4 @@ class Employee extends Authenticatable
         return $this->morphMany(ComplaintAuditLog::class, 'auditable');
     }
 
-
-
 }

@@ -7,6 +7,7 @@ use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
 use App\Models\Attachment;
 use App\Repositories\Complaints\ComplaintRepository;
+use App\Repositories\Web\EmployeeRepository;
 use App\Traits\ApiResponse;
 use Cache;
 use Illuminate\Support\Facades\Auth;
@@ -17,8 +18,10 @@ use Illuminate\Http\Request;
 class EmployeeComplaintService
 {
     use ApiResponse;
-    public function __construct(protected ComplaintRepository $complaintRepository)
+    protected EmployeeRepository $EmployeeRepo;
+    public function __construct(protected ComplaintRepository $complaintRepository, EmployeeRepository $EmployeeRepo)
     {
+        $this->EmployeeRepo = $EmployeeRepo;
     }
     /**
      * Allowed status transitions for complaints.
@@ -180,4 +183,11 @@ class EmployeeComplaintService
             ];
         });
     }
+
+
+    public function searchForEmployee(?string $keyword)
+{
+    $employee = auth('employee-api')->user();
+    return $this->EmployeeRepo->searchForEmployee($keyword, $employee->government_entity_id);
+}
 }

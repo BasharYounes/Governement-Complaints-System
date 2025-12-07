@@ -83,7 +83,7 @@ class EmployeeComplaintController extends Controller
     public function RequestAdditionalInformation($id,Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:user,id',
         ]);
 
         $complaint = $this->complaintRepository->getComplaintById($id);
@@ -105,5 +105,12 @@ class EmployeeComplaintController extends Controller
     {
         $complaint = $this->complaintRepository->getComplaintById($id);
         return $this->success('Complaint retrieved successfully', $complaint, 200);
+    }
+     
+    public function SearchComplaint(Request $request)
+    {
+        $keyword =$request->input('keyword')??'';
+        $complaint =$this ->complaintService->searchForEmployee($keyword);
+    return $this->success('Fetched Complaint Successfully',$complaint,200); 
     }
 }
