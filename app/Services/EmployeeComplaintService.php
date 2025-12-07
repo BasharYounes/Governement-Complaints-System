@@ -47,6 +47,11 @@ class EmployeeComplaintService
             ->get();
     }
 
+    public function getGroupedComplaints(int $entityId): array
+    {
+        return $this->EmployeeRepo->getGrouped($entityId);
+    }
+
     /**
      * Update complaint status with validation and audit logging
      *

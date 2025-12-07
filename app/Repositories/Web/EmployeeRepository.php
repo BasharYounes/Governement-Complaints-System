@@ -30,4 +30,22 @@ class EmployeeRepository
         ->get();
 }
 
+public function getGrouped(int $entityId): array
+    {
+        $statuses = ['new', 'in_progress', 'completed', 'rejected'];
+
+        $result = [];
+
+        foreach ($statuses as $status) {
+            $result[$status] = Complaint::where('government_entity_id', $entityId)
+                ->where('status', $status)
+                ->with('attachments')
+                ->orderByDesc('created_at')
+                ->get();
+        }
+
+        return $result;
+    }
+    
+
 }

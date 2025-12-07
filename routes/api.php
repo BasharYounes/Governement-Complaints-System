@@ -80,7 +80,10 @@ Route::middleware(['AuthenticateUser'])->group(function () {
     Route::get('logout', [AuthController::class, 'logoutEmployee'])->middleware('permission:logout-employee');
     Route::get('/all-complaints', [EmployeeComplaintController::class, 'getAllComplaint'])->middleware('permission:view-complaints');
     Route::get('/show-complaint/{complaintId}', [EmployeeComplaintController::class, 'show'])->middleware('permission:view-complaint');
-    Route::get('/searchComplaint',[EmployeeComplaintController::class,'SearchComplaint'])->middleware('permission:view-complaint');
+    Route::get('/searchComplaint',[EmployeeComplaintController::class,'searchComplaint'])->middleware('permission:view-complaint');
+    Route::get('/complaintsFilter', [EmployeeComplaintController::class, 'FilterComplaints'])->middleware('permission:view-complaint');
+    
+
 });
 
         ///======================

@@ -44,6 +44,16 @@ class EmployeeComplaintController extends Controller
         );
     }
 
+public function FilterComplaints()
+{
+    $employee = auth('employee-api')->user();
+    $complaints = $this->complaintService->getGroupedComplaints($employee->government_entity_id);
+    return $this->success(
+        'تم جلب الشكاوى بنجاح',
+        $complaints
+    );
+}
+
 
 
     /**
@@ -107,7 +117,7 @@ class EmployeeComplaintController extends Controller
         return $this->success('Complaint retrieved successfully', $complaint, 200);
     }
      
-    public function SearchComplaint(Request $request)
+    public function searchComplaint(Request $request)
     {
         $keyword =$request->input('keyword')??'';
         $complaint =$this ->complaintService->searchForEmployee($keyword);
