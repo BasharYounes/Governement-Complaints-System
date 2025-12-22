@@ -100,5 +100,5 @@ Route::middleware(['AuthenticateUser'])->group(function () {
         Route::get('/reports/monthly/pdf', [AdminComplaintController::class, 'monthlyPdf'])->middleware('permission:export-monthly-pdf');
         Route::get('/logout', [AuthController::class, 'logoutAdmin'])->middleware('permission:logout-admin');
         Route::post('/registerEmployee',[AuthController::class,'registerEmployee'])->middleware('permission:manage-users');
-//        Route::get('/searchEmployee',[AdminComplaintController::class,'searchEmployees'])->middleware('permission:manage-users');
+        Route::get('/searchEmployee',[AdminComplaintController::class,'searchEmployees'])->middleware('permission:manage-users');
     });
