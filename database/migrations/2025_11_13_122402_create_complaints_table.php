@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('description');
             $table->enum('status', ['new', 'in_progress', 'completed','rejected'])->default('new');
             $table->string('reference_number')->unique();
-            $table->string('location');
+            $table->string('location')->nullable();
             $table->string('type');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('government_entity_id');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Aspects\TransactionAspect;
 use App\Http\Requests\Attachments\AttachmentRequest;
 use App\Http\Requests\Complaints\ComplaintUpdateRequest;
 use App\Repositories\Attachments\AttachmentRepository;
@@ -42,11 +43,15 @@ class ComplaintController extends Controller
     {
         $governmentEntity = $this->governmentEntityRepository->getCodeById($complaintRequest->government_entity_id);
 
-        $referenceNumber = $this->referenceNumberRepository->generateReferenceNumber($governmentEntity->code);
+        $referenceNumber = TransactionAspect::handle(
+            $this->referenceNumberRepository,
+            'generateReferenceNumber',
+            [$governmentEntity->code]
+        );
 
         $complaint = $this->complaintRepository->createComplaint($complaintRequest->validated(), $referenceNumber);
 
-        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated(), $complaint->id);
+        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated(), $complaint->id) ? : [];
 
     return $this->success('Complaint created successfully',[$complaint,$attachments], 201);
     }
@@ -79,7 +84,7 @@ class ComplaintController extends Controller
 
         $complaint = $this->complaintRepository->getComplaintById($id);
 
-    return $this->success('Complaint allowed editing', $complaint, 200);
+    return $this->success('Complaint allowed editing', $lockKey, 200);
     }
     /**
      * Update the specified resource in storage after checking for edit locks.

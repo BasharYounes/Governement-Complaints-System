@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Aspects\TransactionAspect;
 use App\Models\Complaint;
 use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
@@ -60,7 +61,7 @@ class EmployeeComplaintService
      * @param string|null $notes
      * @return Complaint
      */
-   public function updateComplaintStatus(int $complaintId, string $newStatus, ?string $notes = null)
+   public function updateComplaintStatus(int $complaintId, array $data, ?string $notes = null)
 {
     $employee = auth()->user();
 
@@ -68,9 +69,22 @@ class EmployeeComplaintService
                           ->where('government_entity_id', $employee->government_entity_id)
                           ->first();
 
-    if (!$complaint) {
-        throw new ModelNotFoundException("Complaint not found or you don't have access.");
-    }
+        if (!$complaint) {
+            throw new ModelNotFoundException("Complaint not found or you don't have access.");
+        }
+        $currentStatus = $complaint->status;
+        $newStatus = $data['status'];
+
+        // Check allowed transitions
+        if (!in_array($newStatus, $this->allowedTransitions[$currentStatus])) {
+            throw new \Exception("الحالة المرسلة غير صالحة.");
+        }
+
+        $newComplaint = TransactionAspect::handle(
+            $this->complaintRepository,
+            'updateComplaint',
+            [$complaintId, ['status' => $newStatus]]
+        );
 
     $currentStatus = $complaint->status;
 

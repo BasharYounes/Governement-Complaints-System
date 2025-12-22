@@ -22,7 +22,7 @@ class AttachmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|file|max:10240', // الحد الأقصى لحجم الملف 10 ميجابايت
+            'file' => 'sometimes|file|max:10240', // الحد الأقصى لحجم الملف 10 ميجابايت
         ];
     }
 

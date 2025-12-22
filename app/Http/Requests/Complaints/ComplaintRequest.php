@@ -24,7 +24,7 @@ class ComplaintRequest extends FormRequest
         return [
             'government_entity_id' => 'required|exists:government_entities,id',
             'description' => 'required|string|max:1000',
-            'location' => 'required|array',
+            'location' => 'sometimes|array',
             'type' => 'required|string|max:255',
 
         ];

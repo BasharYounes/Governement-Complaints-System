@@ -90,19 +90,19 @@ class ComplaintObserver
      */
     public function createAuditLog(Complaint $complaint,$action,$description)
     {
-        return  DB::transaction(function () use ($complaint,$action,$description) {
-            $actor = $this->actor();
+        $actor = $this->actor();
 
-            $complaint->auditLogs()->create([
-                'complaint_id' => $complaint->id,
-                'auditable_type' => $actor ? get_class($actor) : null,
-                'auditable_id' => $actor?->getKey(),
-                'action' => $action['status'] ?? $action,
-                'description' => $description,
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->header('User-Agent'),
-            ]);
-        });
+        $complaint->auditLogs()->create([
+            'complaint_id' => $complaint->id,
+            'auditable_type' => $actor ? get_class($actor) : null,
+            'auditable_id' => $actor?->getKey(),
+            'action' => $action['status'] ?? $action,
+            'description' => $description,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->header('User-Agent'),
+        ]);
+
+        return $complaint->auditLogs()->latest()->first();
     }
 
     /**
@@ -110,31 +110,27 @@ class ComplaintObserver
      */
     public function createAuditDetails(Complaint $complaint, $original, $dirty): void
     {
-        DB::transaction(function () use ($complaint,$dirty,$original) {
+        $auditLog = $complaint->auditLogs()->latest()->first();
 
-
-            $auditLog = $complaint->auditLogs()->latest()->first();
-
-            foreach ($dirty as $field => $newValue) {
-                if ($field ==='status' && $this->request->has('notes')) {
-                    $notes = $this->request->input('notes');
-                }
-
-                $originalValue = $original[$field] ?? null;
-
-                // تحويل القيم إلى JSON فقط إذا كانت arrays أو objects
-                // القيم النصية والرقمية تبقى كما هي
-                $originalValue = $this->normalizeValue($originalValue);
-                $normalizedValue = $this->normalizeValue($newValue);
-
-                $auditLog->details()->create([
-                    'field_name' => $field,
-                    'old_value' => $originalValue,
-                    'new_value' => $normalizedValue,
-                    'notes' => $notes ?? null,
-                ]);
+        foreach ($dirty as $field => $newValue) {
+            if ($field ==='status' && $this->request->has('notes')) {
+                $notes = $this->request->input('notes');
             }
-        });
+
+            $originalValue = $original[$field] ?? null;
+
+            // تحويل القيم إلى JSON فقط إذا كانت arrays أو objects
+            // القيم النصية والرقمية تبقى كما هي
+            $originalValue = $this->normalizeValue($originalValue);
+            $normalizedValue = $this->normalizeValue($newValue);
+
+            $auditLog->details()->create([
+                'field_name' => $field,
+                'old_value' => $originalValue,
+                'new_value' => $normalizedValue,
+                'notes' => $notes ?? null,
+            ]);
+        }
     }
 
     /**
