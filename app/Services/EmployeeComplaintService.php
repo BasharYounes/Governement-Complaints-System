@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Aspects\TransactionAspect;
 use App\Models\Complaint;
 use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
@@ -71,7 +72,11 @@ class EmployeeComplaintService
             throw new \Exception("الحالة المرسلة غير صالحة.");
         }
 
-        $newComplaint = $this->complaintRepository->updateComplaint($complaintId, ['status' => $newStatus]);
+        $newComplaint = TransactionAspect::handle(
+            $this->complaintRepository,
+            'updateComplaint',
+            [$complaintId, ['status' => $newStatus]]
+        );
 
         return $newComplaint;
     }

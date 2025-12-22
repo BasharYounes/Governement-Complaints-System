@@ -3,6 +3,7 @@
 namespace App\Repositories\Complaints;
 
 use App\Models\Complaint;
+use App\Attributes\Transactional;
 
 class ComplaintRepository
 {
@@ -28,15 +29,16 @@ class ComplaintRepository
         return $complaint;
     }
 
+    #[Transactional]
     public function updateComplaint($id, array $data): Complaint
     {
-        return \DB::transaction(function () use ($id, $data) {
-            $complaint = Complaint::where('id', $id)->lockForUpdate()->firstOrFail();
+        $complaint = Complaint::where('id', $id)
+        ->lockForUpdate()
+        ->firstOrFail();
 
-            $complaint->update($data);
+        $complaint->update($data);
 
-            return $complaint->fresh();
-        });
+        return $complaint->fresh();
     }
 
     public function deleteComplaint($id): void

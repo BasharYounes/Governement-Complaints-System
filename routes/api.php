@@ -107,6 +107,7 @@ Route::middleware(['AuthenticateAdmin','role:super_admin'])->prefix('admin')->gr
 
         Route::post('/registerEmployee',[AuthController::class,'registerEmployee'])->middleware(['auth:sanctum', 'role:super_admin|permission:manage-users']);
 
+        Route::get('/government-entities', [GovernmentEntitiesController::class, 'index']);
         // Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv']);
         // Route::get('/reports/monthly/pdf', [AdminComplaintController::class, 'monthlyPdf']);
 

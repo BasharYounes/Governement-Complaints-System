@@ -19,7 +19,11 @@ class GovernmentEntitiesController extends Controller
      */
     public function index()
     {
-        return $this->success('Government entities retrieved successfully', $this->governmentEntityRepository->getAllEntities(), 200);
+        return $this->success(
+            'Government entities retrieved successfully',
+            $this->governmentEntityRepository->getAllEntities(),
+            200
+            );
     }
 
     /**

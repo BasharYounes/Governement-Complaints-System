@@ -9,36 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class ComplaintService
 {
-    /**
-     * تغيير حالة الشكوى مع إضافة ملاحظات
-     */
-    public function changeStatus($complaintId, $newStatus, $notes = null, $additionalData = [])
-    {
-        return DB::transaction(function () use ($complaintId, $newStatus, $notes, $additionalData) {
-            $complaint = Complaint::where('id', $complaintId)->firstOrFail();
-            if (!$complaint) {
-                abort(404, 'الشكوى غير موجودة');
-            }
-
-            // استخدام request مصطنع لتمرير البيانات للـ Observer
-            request()->merge([
-                'notes' => $notes,
-
-            ]);
-
-            // التحديث (سي trigger الـ Observer تلقائياً)
-            $complaint->update(['status' => $newStatus]);
-
-            return [
-                'complaint' => $complaint,
-                'status_change' => [
-                    'from' => $complaint->getOriginal('status'),
-                    'to' => $newStatus,
-                    'notes' => $notes
-                ]
-            ];
-        });
-    }
 
     /**
      * إضافة ملاحظة للشكوى
