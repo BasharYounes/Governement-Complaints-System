@@ -29,6 +29,9 @@ class User extends Authenticatable
         'email_verified_at',
         'phone',
         'fcm_token',
+        'failed_login_attempts',
+        'locked_at',
+        'is_locked',
     ];
 
     /**
@@ -55,6 +58,8 @@ class User extends Authenticatable
             'published_at' => 'datetime',
             'password' => 'hashed',
             'verified_at' => 'datetime',
+            'locked_at' => 'datetime',
+            'is_locked' => 'boolean',
         ];
     }
 

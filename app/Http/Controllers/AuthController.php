@@ -18,6 +18,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateUserInformationRequest;
 use App\Services\AuthService;
 use App\Services\GenerateCode;
+use App\Services\LoginAttemptService;
 use App\Traits\ApiResponse;
 use App\Http\Requests\AuthEmployee\SignInRequest as loginEmployeeRequest;
 use App\Http\Requests\AuthEmployee\SignUpRequest as registerEmployeeRequest;
@@ -35,6 +36,7 @@ class AuthController extends Controller
         protected CasheService $casheService,
         protected ComplaintEmployeeRepository $complaintEmployeeRepository,
         protected AdminRepository $adminRepository,
+        protected LoginAttemptService $loginAttemptService,
     ) {}
 
     /**
@@ -142,18 +144,43 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-
-        $user = $this->userRepository->findByEmail($request->email);
-
-        $this->authService->checkPassword($request->password, $user->password);
-
-        $code = $this->codeService->generateCode($user);
-
-        if (!event(new UserRegistered($user, $code))) {
-            throw new CodeSendingException('فشل إرسال الكود');
+        try {
+            $user = $this->userRepository->findByEmail($request->email);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->error('كلمة المرور أو البريد الإلكتروني غير صحيحة', null, 401);
         }
 
-        return $this->success('تم إرسال كود التحقق');
+        // التحقق من حالة الحساب
+        if ($this->loginAttemptService->isAccountLocked($user)) {
+            return $this->error('تم إيقاف حسابك بسبب محاولات تسجيل دخول فاشلة متعددة. يرجى التواصل مع الدعم الفني.', null, 403);
+        }
+
+        try {
+            $this->authService->checkPassword($request->password, $user->password);
+            
+            // إعادة تعيين المحاولات الفاشلة عند نجاح التحقق من كلمة المرور
+            $this->loginAttemptService->resetFailedAttempts($user);
+
+            $code = $this->codeService->generateCode($user);
+
+            if (!event(new UserRegistered($user, $code))) {
+                throw new CodeSendingException('فشل إرسال الكود');
+            }
+
+            return $this->success('تم إرسال كود التحقق');
+        } catch (\Illuminate\Auth\AuthenticationException $e) {
+            // تسجيل محاولة فاشلة
+            $this->loginAttemptService->recordFailedAttempt($user);
+            
+            // إعادة تحميل البيانات للحصول على القيم المحدثة
+            $user->refresh();
+            $remainingAttempts = $this->loginAttemptService->getMaxAttempts() - ($user->failed_login_attempts ?? 0);
+            $message = $remainingAttempts > 0 
+                ? "كلمة المرور غير صحيحة. لديك {$remainingAttempts} محاولات متبقية."
+                : "تم إيقاف حسابك بسبب محاولات تسجيل دخول فاشلة متعددة.";
+
+            return $this->error($message, null, 401);
+        }
     }
 
     /**
