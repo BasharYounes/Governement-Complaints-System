@@ -76,7 +76,7 @@ public function FilterComplaints()
 
         $complaint = $this->complaintService->updateComplaintStatus(
             $complaintId,
-            $request->validated('status'),
+            $request->validated(),
            $request->validated('notes') ?? null
         );
 
@@ -116,11 +116,21 @@ public function FilterComplaints()
         $complaint = $this->complaintRepository->getComplaintById($id);
         return $this->success('Complaint retrieved successfully', $complaint, 200);
     }
-     
+
     public function searchComplaint(Request $request)
     {
         $keyword =$request->input('keyword')??'';
         $complaint =$this ->complaintService->searchForEmployee($keyword);
-    return $this->success('Fetched Complaint Successfully',$complaint,200); 
+    return $this->success('Fetched Complaint Successfully',$complaint,200);
+    }
+
+    public function listAllComplaintLogs()
+    {
+        $complaints = $this->complaintRepository->getallComplaintsWithLogsDetails();
+
+        return $this->success(
+            'Fetched all complaints with audit logs successfully.',
+            $complaints
+        );
     }
 }

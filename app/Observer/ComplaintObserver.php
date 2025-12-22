@@ -10,7 +10,7 @@ use DB;
 
 class ComplaintObserver
 {
-    use DetectsActor;
+
     protected $request;
 
 
@@ -30,7 +30,6 @@ class ComplaintObserver
 
     public function updating(Complaint $complaint): void
     {
-        DB::transaction(function () use ($complaint) {
             $original = $complaint->getOriginal();
             $dirty = $complaint->getDirty();
 
@@ -39,12 +38,12 @@ class ComplaintObserver
             }
             $action = $this->determineAction($dirty);
             $description = $this->generateDescription($action, $dirty, $original);
-            $auditLog = $this->createAuditLog($complaint, $action, $description);
+            $this->createAuditLog($complaint, $action, $description);
             $this->createAuditDetails($complaint, $original, $dirty);
 
              if ($action['Is_status_changed']) {
-            event(new \App\Events\GenericNotificationEvent(
-                User::find($complaint->user_id),
+            dispatch(new \App\Jobs\SendComplaintNotificationJob(
+                $complaint->user_id,
                 'complaint_status_changed',
                 [
                     'reference_number' => $complaint->referance_number,
@@ -53,7 +52,6 @@ class ComplaintObserver
                 ]
             ));
         }
-        });
     }
 
     /**
@@ -61,11 +59,11 @@ class ComplaintObserver
      */
     public function updated(Complaint $complaint): void
     {
-        event(new \App\Events\GenericNotificationEvent(
-                User::find($complaint->user_id),
-                'updateByUser',
-                []
-            ));
+        dispatch(new \App\Jobs\SendComplaintNotificationJob(
+            $complaint->user_id,
+            'updateByUser',
+            []
+        ));
     }
 
     /**
@@ -90,19 +88,7 @@ class ComplaintObserver
      */
     public function createAuditLog(Complaint $complaint,$action,$description)
     {
-        $actor = $this->actor();
-
-        $complaint->auditLogs()->create([
-            'complaint_id' => $complaint->id,
-            'auditable_type' => $actor ? get_class($actor) : null,
-            'auditable_id' => $actor?->getKey(),
-            'action' => $action['status'] ?? $action,
-            'description' => $description,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->header('User-Agent'),
-        ]);
-
-        return $complaint->auditLogs()->latest()->first();
+    \App\Jobs\CreateAuditLogJob::dispatchSync($complaint, $action, $description);
     }
 
     /**
@@ -110,63 +96,8 @@ class ComplaintObserver
      */
     public function createAuditDetails(Complaint $complaint, $original, $dirty): void
     {
-        $auditLog = $complaint->auditLogs()->latest()->first();
-
-        foreach ($dirty as $field => $newValue) {
-            if ($field ==='status' && $this->request->has('notes')) {
-                $notes = $this->request->input('notes');
-            }
-
-            $originalValue = $original[$field] ?? null;
-
-            // تحويل القيم إلى JSON فقط إذا كانت arrays أو objects
-            // القيم النصية والرقمية تبقى كما هي
-            $originalValue = $this->normalizeValue($originalValue);
-            $normalizedValue = $this->normalizeValue($newValue);
-
-            $auditLog->details()->create([
-                'field_name' => $field,
-                'old_value' => $originalValue,
-                'new_value' => $normalizedValue,
-                'notes' => $notes ?? null,
-            ]);
-        }
+        dispatch(new \App\Jobs\CreateAuditDetailsJob($complaint, $original, $dirty));
     }
-
-    /**
-     * تحويل القيمة إلى JSON إذا كانت array أو object، وإلا إرجاعها كما هي
-     */
-    private function normalizeValue($value)
-    {
-        if (is_array($value) || is_object($value)) {
-            return json_encode($value, JSON_UNESCAPED_UNICODE);
-        }
-
-        // إذا كانت JSON string، نحاول تحويلها إلى array ثم إرجاعها كـ JSON مرة أخرى
-        // لضمان التنسيق الموحد
-        if (is_string($value) && $this->isJson($value)) {
-            $decoded = json_decode($value, true);
-            if (is_array($decoded)) {
-                return json_encode($decoded, JSON_UNESCAPED_UNICODE);
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * التحقق من أن النص هو JSON صالح
-     */
-    private function isJson($string)
-    {
-        if (!is_string($string)) {
-            return false;
-        }
-
-        json_decode($string);
-        return json_last_error() === JSON_ERROR_NONE;
-    }
-
     /**
      * تحديد نوع الإجراء بناءً على التغييرات
      */

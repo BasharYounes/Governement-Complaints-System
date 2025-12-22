@@ -9,6 +9,7 @@
         "kreait/laravel-firebase": "^6.1",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "*",
+        "laravel/telescope": "^5.16",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "4.x-dev",
         "mpdf/mpdf": "*",

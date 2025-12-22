@@ -2,27 +2,32 @@
 
 namespace App\Jobs;
 
+use App\Models\Attachment;
 use App\Repositories\Attachments\AttachmentRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessComplaintAttachmentJob implements ShouldQueue
 {
     use Queueable, InteractsWithQueue, SerializesModels, Dispatchable;
 
     public $complaintId;
-    public $attachment;
+    public $path;
+
+    public $userId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($complaintId, $attachment, protected AttachmentRepository $attachmentRepository)
+    public function __construct($complaintId, $path, $userId)
     {
         $this->complaintId = $complaintId;
-        $this->attachment = $attachment;
+        $this->path = $path;
+        $this->userId = $userId;
     }
 
     /**
@@ -30,6 +35,21 @@ class ProcessComplaintAttachmentJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->attachmentRepository->UploadAttachment(['file' => $this->attachment], $this->complaintId);
+        // $attachmentRepository->UploadAttachment($this->path, $this->complaintId , $this->userId);
+        $fileFullPath = Storage::path($this->path);
+        $info = $this->extractInfoFromFile($fileFullPath);
+        $info['complaint_id'] = $this->complaintId;
+        $info['uploaded_by'] = $this->userId;
+        $info['file_path'] = $this->path;
+       Attachment::create($info);
+    }
+
+    public function extractInfoFromFile(string $filePath)
+    {
+        return [
+            'file_name' => basename($filePath),
+            'mime_type' => mime_content_type($filePath),
+            'file_size' => filesize($filePath),
+        ];
     }
 }

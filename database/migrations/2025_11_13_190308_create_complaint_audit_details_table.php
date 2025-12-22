@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('complaint_audit_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('audit_log_id');
+            $table->foreignId('audit_log_id')->constrained('audit_logs')->onDelete('cascade')->onUpdate('cascade');
+            $table->json('data');
             $table->string('field_name');
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();

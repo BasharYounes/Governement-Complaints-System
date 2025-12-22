@@ -18,12 +18,12 @@ class AdminRepository
     {
         return Admin::where('email', $email)->firstOrFail();
     }
-    
+
     public function search(string $keyword)
     {
         return Complaint::query()->with(['user','attachments','governmentEntity'])->where(function (Builder $query)use($keyword)
         {
-            $query ->where('description', 'like', "%{$keyword}%")
+            $query->where('description', 'like', "%{$keyword}%")
                 ->orWhere('status','like',"%$keyword%")
                 ->orWhere('type','like',"%$keyword%")
                 ->orWhere('reference_number','like',"%$keyword%")
@@ -34,10 +34,10 @@ class AdminRepository
                 });
         })->orderByDesc('created_at')->get();
     }
- 
+
      public function searchEmployees(string $keyword)
     {
-        $query = Employee::query(); 
+        $query = Employee::query();
         if(!empty($keyword)) {
             $query->where(function (Builder $q) use ($keyword) {
                 $q->where('name', 'LIKE', "%$keyword%")
@@ -47,5 +47,5 @@ class AdminRepository
         }
         return $query->get();
     }
-    
+
 }

@@ -16,6 +16,7 @@ class ComplaintAuditDetail extends Model
      */
     protected $fillable = [
         'audit_log_id',
+        'data',
         'field_name',
         'old_value',
         'new_value',

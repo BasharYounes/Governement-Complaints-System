@@ -5,7 +5,7 @@ namespace App\Repositories\Attachments;
 use App\Models\Attachment;
 use App\Services\Attachments\AttachmentService;
 use Illuminate\Http\UploadedFile;
-
+use Illuminate\Support\Facades\Storage;
 
 class AttachmentRepository
 {
@@ -15,13 +15,13 @@ class AttachmentRepository
     {
         //
     }
-    public function UploadAttachment(Array $attachmentRequest, $id)
+    public function UploadAttachment($path, $id): Attachment
     {
-        $info = $this->attachmentService->extractInfoFromFile($attachmentRequest['file']);
+        $fileFullPath = Storage::path($path);
+        $info = $this->attachmentService->extractInfoFromFile($fileFullPath);
         $info['complaint_id'] = $id;
-        $info['uploaded_by'] = auth()->guard('api')->id();
-        // Logic to upload attachment
-        $info['file_path'] = $attachmentRequest['file']->store('attachments', 'public');
+        $info['uploaded_by'] = auth()->user()->id;
+        $info['file_path'] = $path;
         return Attachment::create($info);
     }
 

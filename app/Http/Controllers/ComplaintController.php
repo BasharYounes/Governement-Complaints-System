@@ -51,9 +51,17 @@ class ComplaintController extends Controller
 
         $complaint = $this->complaintRepository->createComplaint($complaintRequest->validated(), $referenceNumber);
 
-        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated(), $complaint->id) ? : [];
+        if ($attachmentRequest->hasFile('file')) {
+            $file = $attachmentRequest->file('file');
+            $path = $file->store('attachments');
+            dispatch(new \App\Jobs\ProcessComplaintAttachmentJob(
+                $complaint->id,
+                $path,
+                auth()->user()->id
+            ));
+        }
 
-    return $this->success('Complaint created successfully',[$complaint,$attachments], 201);
+    return $this->success('Complaint created successfully', null, 201);
     }
 
     /**
@@ -107,8 +115,15 @@ class ComplaintController extends Controller
 
     public function addAttachment(AttachmentRequest $attachmentRequest,$id)
     {
-        $attachments = $this->attachmentRepository->UploadAttachment($attachmentRequest->validated(),$id);
-    return $this->success('Attachments uploaded successfully', $attachments, 201);
+        $file = $attachmentRequest->file('file');
+        $path = $file->store('attachments');
+        dispatch(new \App\Jobs\ProcessComplaintAttachmentJob(
+            $id,
+            $path,
+            auth()->user()->id
+        ));
+
+    return $this->success('Attachments uploaded successfully', null, 201);
     }
 
     public function getComplaintsforUser()
