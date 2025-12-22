@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Complaint;
 use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
+use App\Models\Employee;
+use App\Repositories\Web\AdminRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,9 +18,18 @@ class AdminComplaintService
      *
      * @return Collection
      */
+
+    protected AdminRepository $adminRepo;
+
+    public function __construct(AdminRepository $adminRepo)
+    {
+        $this->adminRepo = $adminRepo;
+    }
+
+
     public function listAllComplaints(): Collection
     {
-        return Complaint::with(['users', 'governmentEntity', 'attachments']) // use correct relationship name
+        return Complaint::with(['user', 'governmentEntity', 'attachments']) 
             ->orderByDesc('created_at')
             ->get();
     }
@@ -143,7 +154,7 @@ class AdminComplaintService
     }
     public function listAllEmployees()
 {
-    return \App\Models\Employee::whereNotNull('government_entity_id')
+    return Employee::whereNotNull('government_entity_id')
         ->with('governmentEntity')
         ->orderBy('name')
         ->get();
@@ -224,6 +235,13 @@ public function getStatistics(): array
     ];
 }
 
-
+public function searchComplaints(string $keyword)
+{
+ return $this->adminRepo->search($keyword);
+}
+    public function searchEmployees(string $keyword)
+    {
+        return $this->adminRepo->searchEmployees($keyword);
+    }
 
 }

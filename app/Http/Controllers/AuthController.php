@@ -8,7 +8,7 @@ use App\Exceptions\InvalidCodeException;
 use App\Http\Requests\EmailAndCodeRequest;
 use App\Http\Requests\EmailRequest;
 use App\Http\Requests\LoginRequest;
-use App\Repositories\Admin\AdminRepository;
+use App\Repositories\Web\AdminRepository;
 use App\Repositories\ComplaintEmployeeRepository;
 use App\Repositories\UserRepository;
 use App\Services\CasheService;

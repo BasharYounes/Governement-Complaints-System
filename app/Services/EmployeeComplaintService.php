@@ -8,6 +8,7 @@ use App\Models\ComplaintAuditLog;
 use App\Models\ComplaintAuditDetail;
 use App\Models\Attachment;
 use App\Repositories\Complaints\ComplaintRepository;
+use App\Repositories\Web\EmployeeRepository;
 use App\Traits\ApiResponse;
 use Cache;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,10 @@ use Illuminate\Http\Request;
 class EmployeeComplaintService
 {
     use ApiResponse;
-    public function __construct(protected ComplaintRepository $complaintRepository)
+    protected EmployeeRepository $EmployeeRepo;
+    public function __construct(protected ComplaintRepository $complaintRepository, EmployeeRepository $EmployeeRepo)
     {
+        $this->EmployeeRepo = $EmployeeRepo;
     }
     /**
      * Allowed status transitions for complaints.
@@ -45,6 +48,11 @@ class EmployeeComplaintService
             ->get();
     }
 
+    public function getGroupedComplaints(int $entityId): array
+    {
+        return $this->EmployeeRepo->getGrouped($entityId);
+    }
+
     /**
      * Update complaint status with validation and audit logging
      *
@@ -53,13 +61,13 @@ class EmployeeComplaintService
      * @param string|null $notes
      * @return Complaint
      */
-    public function updateComplaintStatus(int $complaintId, array $data, ?string $notes = null)
-    {
-        $employee = auth()->user();
+   public function updateComplaintStatus(int $complaintId, array $data, ?string $notes = null)
+{
+    $employee = auth()->user();
 
-        $complaint = Complaint::where('id', $complaintId)
-                              ->where('government_entity_id', $employee->government_entity_id)
-                              ->first();
+    $complaint = Complaint::where('id', $complaintId)
+                          ->where('government_entity_id', $employee->government_entity_id)
+                          ->first();
 
         if (!$complaint) {
             throw new ModelNotFoundException("Complaint not found or you don't have access.");
@@ -78,8 +86,27 @@ class EmployeeComplaintService
             [$complaintId, ['status' => $newStatus]]
         );
 
-        return $newComplaint;
+    $currentStatus = $complaint->status;
+
+    //  Check if currentStatus exists in allowedTransitions
+    if (!array_key_exists($currentStatus, $this->allowedTransitions)) {
+        throw new \Exception("الحالة الحالية غير معروفة في النظام.");
     }
+
+    //  Check if newStatus is allowed for this currentStatus
+    if (!in_array($newStatus, $this->allowedTransitions[$currentStatus])) {
+        throw new \Exception("الحالة المرسلة غير صالحة.");
+    }
+
+    $newComplaint = $this->complaintRepository->updateComplaint($complaintId, [
+        'status' => $newStatus,
+        'notes'  => $notes
+    ]);
+
+    return $newComplaint;
+}
+
+
 
     /**
      * Add notes to a complaint and log the change
@@ -175,4 +202,11 @@ class EmployeeComplaintService
             ];
         });
     }
+
+
+    public function searchForEmployee(?string $keyword)
+{
+    $employee = auth('employee-api')->user();
+    return $this->EmployeeRepo->searchForEmployee($keyword, $employee->government_entity_id);
+}
 }

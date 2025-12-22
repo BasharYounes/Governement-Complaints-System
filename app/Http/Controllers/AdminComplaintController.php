@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\GenericNotificationEvent;
 use App\Models\Complaint;
 use App\Services\AdminComplaintService;
+use App\Services\EmployeeComplaintService;
 use App\Services\ExportReportsService;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
@@ -17,9 +18,12 @@ class AdminComplaintController extends Controller
 {
     protected AdminComplaintService $complaintService;
     protected ExportReportsService $exportService;
-   public function __construct(AdminComplaintService $complaintService , ExportReportsService $exportService)
+    protected EmployeeComplaintService $employeeComplaintService;
+
+   public function __construct(AdminComplaintService $complaintService , ExportReportsService $exportService, EmployeeComplaintService $employeeComplaintService)
 {
     $this->complaintService = $complaintService;
+    $this->employeeComplaintService = $employeeComplaintService;
 
     //$this->middleware(['auth:sanctum', 'role:super_admin']);
     $this->exportService = $exportService;
@@ -135,20 +139,29 @@ public function statistics()
 
 public function monthlyPdf(Request $request)
 {
-    // إذا ما وصل month → ناخد الشهر الحالي
     $month = $request->month ?? now()->format('Y-m');
 
-    // الحصول على البيانات
     $complaints = $this->exportService->getMonthlyComplaints($month);
 
-    // توليد مسار الملف
     $filePath = $this->exportService->exportPdf($complaints, $month);
 
-    // إرسال رابط التحميل (API Friendly)
     return response()->json([
         'success' => true,
         'url' => asset($filePath)
     ]);
 }
+public function searchComplaints(Request $request)
+{
+   $keyword = $request->input('keyword')??'';
+   $complaints =$this->complaintService->searchComplaints($keyword);
+   return $this->success('Fetched Search Results successfully.',$complaints);
+}
+public function searchEmployees(Request $request)
+    {
+        $keyword = $request->input('keyword') ?? '';
+        $employees = $this->complaintService->searchEmployees($keyword);
+
+        return $this->success('Fetched Employee Results successfully', $employees);
+    }
 
 }
