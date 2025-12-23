@@ -9,7 +9,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-Schedule::command('backup:run --only-db')
+Schedule::command('backup:run')
     ->dailyAt('02:00')
     ->withoutOverlapping()
     ->onSuccess(function () {
