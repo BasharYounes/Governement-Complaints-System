@@ -53,11 +53,14 @@ class ComplaintController extends Controller
 
         if ($attachmentRequest->hasFile('file')) {
             $file = $attachmentRequest->file('file');
-            $path = $file->store('attachments');
+            $data = $this->attachmentService->extractInfoFromFile($attachmentRequest['file']);
+            $path = $file->store('attachments','public');
             dispatch(new \App\Jobs\ProcessComplaintAttachmentJob(
                 $complaint->id,
                 $path,
-                auth()->user()->id
+                auth()->user()->id,
+                $data,
+
             ));
         }
 
@@ -116,11 +119,14 @@ class ComplaintController extends Controller
     public function addAttachment(AttachmentRequest $attachmentRequest,$id)
     {
         $file = $attachmentRequest->file('file');
-        $path = $file->store('attachments');
+        $data = $this->attachmentService->extractInfoFromFile($attachmentRequest['file']);
+        $path = $file->store('attachments','public');
         dispatch(new \App\Jobs\ProcessComplaintAttachmentJob(
             $id,
             $path,
-            auth()->user()->id
+            auth()->user()->id,
+            $data,
+
         ));
 
     return $this->success('Attachments uploaded successfully', null, 201);

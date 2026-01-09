@@ -94,6 +94,7 @@ public function FilterComplaints()
     {
         $request->validate([
             'user_id' => 'required|exists:user,id',
+            'notes' => 'required',
         ]);
 
         $complaint = $this->complaintRepository->getComplaintById($id);
@@ -101,7 +102,10 @@ public function FilterComplaints()
         event(new GenericNotificationEvent(
             $request->user_id,
             "RequestAdditionalInformation",
-            ["reference_number" => $complaint->reference_number]
+            [
+                "reference_number" => $complaint->reference_number,
+                "notes" => $request->notes
+                ]
         ));
     }
     public function getAllComplaint()

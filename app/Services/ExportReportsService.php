@@ -20,6 +20,19 @@ class ExportReportsService
                                     ->get();
     }
 
+    /**
+     * احصل على الشكاوى خلال نطاق تاريخي معين
+     *
+     * @param string $fromDate تاريخ البداية بصيغة Y-m-d
+     * @param string $toDate تاريخ النهاية بصيغة Y-m-d
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getComplaintsByDateRange($fromDate, $toDate)
+    {
+        return Complaint::whereBetween('created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59'])
+                        ->get();
+    }
+
     
     public function exportCsv($complaints, $filename)
     {

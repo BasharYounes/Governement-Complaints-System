@@ -88,7 +88,7 @@ Route::middleware(['AuthenticateAdmin','role:super_admin'])->prefix('admin')->gr
     Route::get('/complaints', [AdminComplaintController::class, 'index'])
         ->middleware('permission:view-all-complaints');
 
-    Route::get('/employees', [AdminComplaintController::class, 'listEmployees'])
+    Route::get('/employees', [AdminComplaintController::class, 'listUsers'])
         ->middleware('permission:view-employees');
 
     Route::get('/complaints/{complaintId}/audit-logs', [AdminComplaintController::class, 'complaintAuditLogs'])
@@ -96,9 +96,6 @@ Route::middleware(['AuthenticateAdmin','role:super_admin'])->prefix('admin')->gr
 
     Route::get('/statistics', [AdminComplaintController::class, 'statistics'])
         ->middleware('permission:view-statistics');
-
-    Route::get('/complaint-logs', [AdminComplaintController::class, 'listAllComplaintLogs'])
-        ->middleware('permission:view-all-complaint-logs');
 
     Route::get('/reports/monthly/csv', [AdminComplaintController::class, 'monthlyCsv'])
         ->middleware('permission:export-monthly-csv');

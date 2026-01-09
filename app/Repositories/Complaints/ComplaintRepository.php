@@ -55,6 +55,7 @@ class ComplaintRepository
     public function allComplaint()
     {
         return Complaint::with('attachments')->where('government_entity_id', auth()->user()->government_entity_id)->paginate(10);
+        //['logs.details','attachments','user','governmentEntity']
     }
 
     public function getallComplaintsWithLogsDetails()

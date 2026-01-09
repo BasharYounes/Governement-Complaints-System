@@ -20,14 +20,17 @@ class ProcessComplaintAttachmentJob implements ShouldQueue
 
     public $userId;
 
+    public $data;
+
     /**
      * Create a new job instance.
      */
-    public function __construct($complaintId, $path, $userId)
+    public function __construct($complaintId, $path, $userId,$data)
     {
         $this->complaintId = $complaintId;
         $this->path = $path;
         $this->userId = $userId;
+        $this->data = $data;
     }
 
     /**
@@ -36,12 +39,10 @@ class ProcessComplaintAttachmentJob implements ShouldQueue
     public function handle(): void
     {
         // $attachmentRepository->UploadAttachment($this->path, $this->complaintId , $this->userId);
-        $fileFullPath = Storage::path($this->path);
-        $info = $this->extractInfoFromFile($fileFullPath);
-        $info['complaint_id'] = $this->complaintId;
-        $info['uploaded_by'] = $this->userId;
-        $info['file_path'] = $this->path;
-       Attachment::create($info);
+        $this->data['complaint_id'] = $this->complaintId;
+        $this->data['uploaded_by'] = $this->userId;
+        $this->data['file_path'] = $this->path;
+       Attachment::create($this->data);
     }
 
     public function extractInfoFromFile(string $filePath)

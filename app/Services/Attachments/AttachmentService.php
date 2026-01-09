@@ -8,12 +8,12 @@ class AttachmentService
     /**
      * منطق لاستخراج معلومات من الملف.
      */
-   public function extractInfoFromFile(string $filePath)
+   public function extractInfoFromFile(UploadedFile $uploadedFile)
     {
         return [
-            'file_name' => basename($filePath),
-            'mime_type' => mime_content_type($filePath),
-            'file_size' => filesize($filePath),
+            'file_name' => $uploadedFile->getClientOriginalName() ,
+            'mime_type' => $uploadedFile->getClientMimeType(),
+            'file_size' => $uploadedFile->getSize(),
         ];
     }
 }

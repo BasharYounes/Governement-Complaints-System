@@ -5,6 +5,7 @@ namespace App\Repositories\Web;
 use App\Models\Admin;
 use App\Models\Complaint;
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
 class AdminRepository
@@ -23,14 +24,14 @@ class AdminRepository
     {
         return Complaint::query()->with(['user','attachments','governmentEntity'])->where(function (Builder $query)use($keyword)
         {
-            $query->where('description', 'like', "%{$keyword}%")
+            $query->where('description', 'like', "%$keyword%")
                 ->orWhere('status','like',"%$keyword%")
                 ->orWhere('type','like',"%$keyword%")
                 ->orWhere('reference_number','like',"%$keyword%")
                 ->orWhere('location','like',"%$keyword%")
                 ->orWhereHas('governmentEntity',function (Builder $q) use ($keyword)
                 {
-                 $q->where('name','like',"%$keyword%");
+                 $q->where('name','like',"%$keyword %");
                 });
         })->orderByDesc('created_at')->get();
     }
@@ -48,4 +49,15 @@ class AdminRepository
         return $query->get();
     }
 
+    public function complaintAuditLogs($complaintId)
+    {
+        return Complaint::with(['governmentEntity','user','attachments', 'auditLogs' => function ($query) {
+            $query->with(['details'])->orderBy('created_at', 'desc');
+        }])->findOrFail($complaintId);
+    }
+
+    public function getAllUsers()
+    {
+        return User::all();
+    }
 }

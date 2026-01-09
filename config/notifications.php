@@ -8,7 +8,7 @@ return [
         ],
         'RequestAdditionalInformation' =>[
             'title' => 'طلب معلومات حول شكوى',
-            'body' => 'نرجو منك تزويدنا بمعلومات إضافية عن الشكوى التي الرقم المرجعي لها.{{reference_number}}'
+            'body' => 'نرجو منك تزويدنا بالمعلومات الإضافية {{notes}} عن الشكوى التي الرقم المرجعي لها.{{reference_number}}'
         ],
         'updateByUser' => [
             'title' => 'تعديل شكوى',
