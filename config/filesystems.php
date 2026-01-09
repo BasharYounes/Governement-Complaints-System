@@ -36,7 +36,7 @@ return [
             'throw' => false,
         ],
 
-    
+
 
         'public' => [
             'driver' => 'local',
@@ -56,6 +56,15 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
+        ],
+
+        'google' => [
+            'driver' => 'google',
+            'serviceAccount' => [
+                'credentials' => storage_path('app/google/service-account.json'),
+            ],
+            'folder' => env('GOOGLE_DRIVE_FOLDER_ID'),
+            'throw' => false
         ],
 
     ],

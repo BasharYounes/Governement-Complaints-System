@@ -6,14 +6,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "google/apiclient": "^2.18",
         "kreait/laravel-firebase": "^6.1",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "*",
         "laravel/telescope": "^5.16",
         "laravel/tinker": "^2.9",
+        "league/flysystem-aws-s3-v3": "3.0",
         "maatwebsite/excel": "4.x-dev",
+        "masbug/flysystem-google-drive-ext": "^2.4",
         "mpdf/mpdf": "*",
-        "spatie/laravel-backup": "*",
+        "spatie/laravel-backup": "^9.2",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {
