@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
    ->withMiddleware(function (Middleware $middleware) {
     $middleware->api(append: [
         \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        \App\Http\Middleware\EnsureApiRequest::class, 
+        \App\Http\Middleware\EnsureApiRequest::class,
     ]);
     $middleware->alias([
         'AuthenticateEmployee' => \App\Http\Middleware\Employee\EmployeeMidlleware::class,
@@ -25,7 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
         'AuthenticateUser' => \App\Http\Middleware\User\UserMiddleware::class,
         'role' => RoleMiddleware::class,
         'permission' => PermissionMiddleware::class,
-
     ]);
 })
 

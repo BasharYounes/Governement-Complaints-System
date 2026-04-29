@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\GenericNotificationEvent;
 use App\Http\Requests\UpdateComplaintStatusRequest;
+use App\Models\User;
 use App\Repositories\ComplaintEmployeeRepository;
 use App\Repositories\Complaints\ComplaintRepository;
 use App\Services\EmployeeComplaintService;
@@ -93,20 +94,21 @@ public function FilterComplaints()
     public function RequestAdditionalInformation($id,Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:user,id',
+            'user_id' => 'required|exists:users,id',
             'notes' => 'required',
         ]);
 
         $complaint = $this->complaintRepository->getComplaintById($id);
 
         event(new GenericNotificationEvent(
-            $request->user_id,
+            User::findOrFail($request->user_id),
             "RequestAdditionalInformation",
             [
                 "reference_number" => $complaint->reference_number,
                 "notes" => $request->notes
                 ]
         ));
+        return $this->success('تم ارسال الطلب بنجاح');
     }
     public function getAllComplaint()
     {
